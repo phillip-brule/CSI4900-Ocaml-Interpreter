@@ -26,6 +26,22 @@ type expression =
 	| If_exp of expression * expression * expression
 	| Let_exp of var * expression * expression
 
+(* Specification of Values *)
+type exp_value = ExpVal of int | ExpVal of bool
+type den_value = DenVal of int | DenVal of bool
+
+let num_val (i:int) : exp_value = 
+	ExpVal(i)
+let bool_val (b:bool) : exp_value = 
+	ExpVal(b)
+let expval_to_num (val:exp_value) : int = 
+	match val with
+	| ExpVal(i) -> i
+	| _ -> error
+let expval_to_bool (val:exp_value) : bool = 
+	| ExpVal(b) -> b
+	| - -> error
+
 
 (* Interpreter for LET language *)
 
@@ -35,19 +51,21 @@ let run (s:string) : value =
 let value_of_program (p:program) : value = 
 	match p with
 	| Expression(exp) -> let init_env = empty_env in
-		value_of(exp, env)
+		value_of(exp, init_env)
 
-let rec value_of (exp:expression) (environment:env) : value = 
+let rec value_of (exp:expression) (environment:env) : exp_value = 
 	match exp with
-	| Const_exp(constant_n) -> constant n
-	| Var_exp(variable) -> apply_env(environment, variable)
+	| Const_exp(constant_n) -> num_val(constant_n)
+	| Var_exp(variable) -> num_val(apply_env(environment, variable))
 	| Diff_exp(exp1,exp2) -> let val1 = value_of(exp1, environment) in
 		let val2 = value_of(exp2, environment) in 
-			val1 - val2
+			num_val(val1 - val2)
 	| Zero_exp(exp) -> let val = value_of(exp) in
-		if val = 0 then T else F
-	| If_exp(exp1,exp2,exp3) -> let val = value_of(exp1) in 
+		if val = 0 then bool_val(true) else bool_val(false)
+	| If_exp(exp1,exp2,exp3) -> let val = value_of(exp1, environment) in 
 		match val with
-		| Bool(T) -> value_of(exp2)
-		| Bool(F) -> value_of(exp3)
-	| Let_exp
+		| ExpVal(true) -> value_of(exp2,environment)
+		| ExpVal(false) -> value_of(exp3,environment)
+		| _ -> error
+	| Let_exp(variable, exp, body) ->
+		value_of(body, extend_env(variable, value_of(exp), environment))
