@@ -9,7 +9,7 @@ type extend_env = Empty of empty_env | [V of var * I of int :: Ex of extend_env]
 
 (* -------------------------------------------------------------------------------- *)
 (* Two *)
-type env = [] | [V or var * I of int:: E of env]
+type env = [] | [V of var * I of int:: E of env]
 type var = Sym of string
 
 let empty_env (e:env) : env = []
