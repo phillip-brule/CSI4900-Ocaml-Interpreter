@@ -25,7 +25,7 @@ type expression =
 	| If_exp of expression * expression * expression
 	| Let_exp of var * expression * expression
 	| Proc_exp of var * expression
-	| Call_exp of expression * expression  (* operator operand *)
+	| Call_exp of expression * expression  
 
 (* Specification of Values *)
 type exp_value = ExpVal of int | ExpVal of bool | proc
