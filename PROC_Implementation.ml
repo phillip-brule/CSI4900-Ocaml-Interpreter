@@ -20,7 +20,7 @@ let rec apply_env(e:env) (search_v:var) : value =
 
 type expression = 
   | Zero_exp of expression
-  | Const_exp of int
+  | Const_exp of value
   | Diff_exp of expression * expression
   | Var_exp of var
   | If_exp of expression * expression * expression
