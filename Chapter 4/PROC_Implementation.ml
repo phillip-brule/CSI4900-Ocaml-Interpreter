@@ -96,6 +96,7 @@ let value_of_program (p:program) : int =
 (* let run (s:string) : int = 
   s |> scan_and_parse |> value_of_program *)
 
+(* p is equal to the parsed code snippet from 3.3.1 pg77 *)
 let example_run () = 
 	let p = Expression(Let_exp("x", Const_exp(200), Let_exp("f", 
 		Proc_exp("z", Diff_exp(Var_exp("z"), Var_exp("x"))),
