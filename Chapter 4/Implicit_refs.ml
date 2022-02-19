@@ -1,48 +1,41 @@
 
 exception Invalid
-
+(* Specification of Values *)
+type reference = int
 type var = string 
-type env = Empty_env | Extend_env of var * exp_value * env
-
-let empty_env () : env = Empty_env
-
-let extend_env (v:var) (value:exp_value) (e:env) : env = 
-  Extend_env(v, value, e)
-
-let rec apply_env(e:env) (search_v:var) : exp_value = 
-  match e with
-  | Empty_env -> raise Invalid
-  | Extend_env(variable, value, envNext) -> if variable = search_v then value 
-		else apply_env envNext search_v
-
-
 type expression = 
   | Zero_exp of expression
-  | Const_exp of value
+  | Const_exp of int
   | Diff_exp of expression * expression
   | Var_exp of var
   | If_exp of expression * expression * expression
   | Let_exp of var * expression * expression
   | Proc_exp of var * expression
   | Call_exp of expression * expression  (* operator operand *)
-  | Newref_exp of expression
-  | Deref_exp of expression
-  | Setref_exp of expression * expression
   | Assign_exp of var * expression
+
+type program = Expression of expression 
 
 type procedure = {
 	var : var;
 	body : expression;
 	saved_env : env;
 }
+and env = Empty_env | Extend_env of var * reference * env
+and exp_value = ExpVal of int | ExpBool of bool | Proc of procedure
 
-
-(* Specification of Values *)
-type reference = int
-type exp_value = ExpVal of int | ExpBool of bool | Proc of procedure
 type den_value = Ref of reference
+let empty_env () : env = Empty_env
+
+let extend_env (v:var) (refNum:reference) (e:env) : env = 
+  Extend_env(v, refNum, e)
+
+let rec apply_env(e:env) (search_v:var) : reference = 
+  match e with
+  | Empty_env -> raise Invalid
+  | Extend_env(variable, value, envNext) -> if variable = search_v then value 
+		else apply_env envNext search_v
                                                         
-type program = Expression of expression 
 
 (* an array may not the best use for this because everytime an end insert is need, in order to append
 to the end of the array ocaml will reconstruct a new array and return a new array rather than just
@@ -72,8 +65,7 @@ let bool_val (b:bool) : exp_value =
   ExpBool(b)
 let proc_val (p:procedure) : exp_value = 
   Proc(p)
-let ref_val (r:reference) : exp_value = 
-	Ref(r)
+
 
 let expval_to_num (value:exp_value) : int = 
   match value with
@@ -87,72 +79,72 @@ let expval_to_proc (value:exp_value) : procedure =
   match value with
   | Proc(p) -> p
   | _ -> raise Invalid
- let expval_to_reference (value:exp_value) : reference = 
- 	match value with
- 	| Ref(r) -> r
- 	| _ -> raise Invalid
+
 
 let procedure (v:var) (body:expression) (environment:env) : procedure = 
   {var = v;
   body = body;
   saved_env = environment;}
 
+
+(* Functions for referencing---------------------------------------------------- *)
+(* reference number is equal to its location *)
+let newref (value:exp_value)  : reference = 
+	global_store.store <- Array.append global_store.store [|value|];
+		(Array.length global_store.store) - 1
+
+let deref (refNum: reference) : exp_value = 
+	global_store.store.(refNum)
+
+(* returns false if setting reference is unsuccessful *)
+let setref (refNum: reference) (value: exp_value) : bool = 
+	try
+		global_store.store.(refNum) <- value;
+			true
+	with
+		Invalid_argument(_) -> false
+
+
+
 let rec value_of (exp:expression) (environment:env) : exp_value = 
 	match exp with
 	| Const_exp(constant_n) -> num_val constant_n 
-	| Var_exp(variable) -> num_val (apply_env environment variable)
+	| Var_exp(variable) -> deref (apply_env environment variable)
 	| Diff_exp(exp1,exp2) -> let val1 = expval_to_num (value_of exp1 environment) in
 		let val2 = expval_to_num (value_of exp2 environment) in 
 		num_val (val1 - val2)
 	| Zero_exp(exp1) -> let value = expval_to_num (value_of exp1 environment) in
 		if value = 0 then bool_val true else bool_val false
 	| If_exp(exp1,exp2,exp3) -> let value = value_of exp1 environment in 
-		match value with
+		begin match value with
 		| ExpBool(true) -> value_of exp2 environment 
 		| ExpBool(false) -> value_of exp3 environment
 		| _ -> raise Invalid
+	end
 	| Let_exp(variable, exp1, body) ->
-		value_of body (extend_env variable (value_of exp1 environment) environment)
+		value_of body (extend_env variable (newref (value_of exp1 environment)) environment)
 			(* creates procedure in context of current environment *)
 	| Proc_exp(var, body) -> proc_val (procedure var body environment)
 	(* type check to make sure a proc is the operator but said proc has to be evaluted first *)
 	| Call_exp(operator, operand) -> let proc = expval_to_proc (value_of operator environment) in 
 		let arg = value_of operand environment in 
 		let apply_procedure (p:procedure) (value:exp_value) : exp_value = 
-  			value_of p.body (extend_env p.var value p.saved_env) in
+  			value_of p.body (extend_env p.var (newref value) p.saved_env) in
 					apply_procedure proc arg
-	| Assign_exp(var, exp1) -> setref (apply_env environment var) (value_of exp1 environment);
+	| Assign_exp(var, exp1) -> if setref (apply_env environment var) (value_of exp1 environment) then print_string "Varriable Assignment Success  " else raise (Failure "variable assignment failure");
 		num_val 27
 
 
 
-let value_of_program (p:program) : value = 
+let value_of_program (p:program) : int = 
   match p with
   | Expression(exp) -> let init_env = empty_env() in
       expval_to_num (value_of exp init_env)
 
-let run (s:string) : value = 
-  s |> scan_and_parse |> value_of_program
+let example_run () = 
+	let p = Let_exp("f", Proc_exp("x", Proc_exp("y", 
+		Assign_exp("x", Diff_exp(Var_exp("x"), Const_exp(-1))) )),
+		Call_exp(Call_exp(Var_exp("f"),Const_exp(44)), Const_exp(33)))
+	in print_int (value_of_program (Expression(p))) 
 
-let get_reference_index (refNum: reference) : int = 
-	let storeLength = Array.length global_store in
-		let referenceIndex = storeLength - refNum in
-			referenceIndex
-
-(* reference number is equal to the compliment of its location *)
-let newref (value:exp_value)  : reference = 
-	global_store.store <- [|value::global_store.store|];
-		(Array.length global_store.store) - 1
-
-let deref (refNum: reference) : exp_value = 
-	let referenceIndex = get_reference_index refNum in
-			current_store.(referenceIndex)
-
-(* returns false if setting reference is unsuccessful *)
-let setref (refNum: reference) (value: exp_value) : bool = 
-	try
-		let referenceIndex = get_reference_index refNum in
-			global_store.(referenceIndex) <- value;
-				true
-	with
-		Invalid_argument -> false
+let () = example_run()

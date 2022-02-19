@@ -179,7 +179,4 @@ let example_run3 () =
 	let p = Let_exp("g", Newref_exp(Const_exp(0)), Deref_exp(Var_exp("g")))
 	in print_int (value_of_program (Expression(p))) 
 
-
-
-
 let () = example_run1()
