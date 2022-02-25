@@ -158,6 +158,15 @@ let value_of_program (p:program) : int =
 
 
 (* example program written on bottom of page 105 returns -1*)
+(* let g = let counter = newref(0)
+	in proc(dummy)
+		begin
+				setref(counter, -(deref(counter), -1));
+				deref(counter)
+		end
+in let a = (g 11) (* () = call expression *)
+	in let b = (g 11)
+		in -(a,b) *)
 let example_run1 () = 
 	let p = Let_exp("counter", Newref_exp(Const_exp(0)), 
 		Let_exp("g", Proc_exp("dummy", Setref_exp(Var_exp("counter"), Diff_exp(Deref_exp(Var_exp("counter")), Const_exp(-1)))),

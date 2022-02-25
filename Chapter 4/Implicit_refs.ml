@@ -141,9 +141,19 @@ let value_of_program (p:program) : int =
   | Expression(exp) -> let init_env = empty_env() in
       expval_to_num (value_of exp init_env)
 
+
+(* figure 4.8 on page 120 returns 12*)
+(* Note: to express parts of code that have procedures with multiple operations, Let expressions may be used for 
+each operation. The body of the final let expression will be the return value *)
+(* let f = proc (x) proc (y)
+	begin 
+		set x = -(x,-1);
+		-(x,y)
+	end 
+in ((f 44) 33) *)
 let example_run () = 
 	let p = Let_exp("f", Proc_exp("x", Proc_exp("y", 
-		Assign_exp("x", Diff_exp(Var_exp("x"), Const_exp(-1))) )),
+		Let_exp("result", Assign_exp("x", Diff_exp(Var_exp("x"), Const_exp(-1))), Diff_exp(Var_exp("x"), Var_exp("y")) ))),
 		Call_exp(Call_exp(Var_exp("f"),Const_exp(44)), Const_exp(33)))
 	in print_int (value_of_program (Expression(p))) 
 

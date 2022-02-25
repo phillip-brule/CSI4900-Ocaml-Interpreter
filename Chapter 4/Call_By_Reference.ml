@@ -213,11 +213,15 @@ let value_of_program (p:program) : int =
 
 
 (* example on page 131 returns 44*)
+(* let f = proc (x) set x = 44
+in let g = proc ( y) (f y)
+	in let z = 55
+		 in begin (g z); z end *)
 let example_run () = 
-	let p = Let_exp("f", Proc_exp("x", Setref_exp(Var_exp("x"), Const_exp(44))),
+	let p = Let_exp("f", Proc_exp("x", Assign_exp("x",Const_exp(44))),
 						Let_exp("g", Proc_exp("y", Call_exp(Var_exp("f"), Var_exp("y"))),
-							Let_exp("z", Newref_exp(Const_exp(55)),
-								Let_exp("res", Call_exp(Var_exp("g"), Var_exp("z")), Deref_exp(Var_exp("z"))))))
+							Let_exp("z", Const_exp(55),
+								Let_exp("res", Call_exp(Var_exp("g"), Var_exp("z")), Var_exp("z")))))
 	in print_int (value_of_program (Expression(p))) 
 
 let () = example_run()

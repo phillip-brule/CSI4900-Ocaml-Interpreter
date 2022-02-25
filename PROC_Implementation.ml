@@ -96,6 +96,12 @@ let value_of_program (p:program) : int =
 (* let run (s:string) : int = 
   s |> scan_and_parse |> value_of_program *)
 
+(* Example run found on page 77 with return value of -100 *)
+(* let x = 200
+	in let f = proc (z) -(z,x)
+		in let x = 100
+			in let g = proc (z) -(z,x)
+				in -((f 1), (g 1)) *)
 let example_run () = 
 	let p = Expression(Let_exp("x", Const_exp(200), Let_exp("f", 
 		Proc_exp("z", Diff_exp(Var_exp("z"), Var_exp("x"))),

@@ -183,6 +183,12 @@ let value_of_program (p:program) : int =
 
 
 (* figure 4.11 example on pg 127 returns 88*)
+(* let glo = pair(11,22)
+in let f = proc (loc)
+	let d1 = setright(loc, left(loc))
+	in let d2 = setleft(glo,99)
+	in -(left(loc), right(loc))
+in (f glo) *)
 let example_run () = 
 	let p = Let_exp("glo", Newpair_exp(Const_exp(11),Const_exp(22)),
 						Let_exp("f", Proc_exp("loc", Let_exp("d1", Setright_exp(Var_exp("loc"), Left_exp(Var_exp("loc"))),
