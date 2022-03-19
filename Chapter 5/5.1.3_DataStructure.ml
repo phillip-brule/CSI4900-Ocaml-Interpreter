@@ -30,7 +30,7 @@ and exp_value = ExpVal of int | ExpBool of bool | Proc of procedure
                                                         
 type program = Expression of expression 
 
-type final_answer = ExpVal of exp_value
+type final_answer = FinalVal of exp_value
 
 type continuation =
   | End_cont 
@@ -74,18 +74,22 @@ let expval_to_proc (value:exp_value) : procedure =
   match value with
   | Proc(p) -> p
   | _ -> raise Invalid
-           
-
+let expval_to_finalanswer (value:exp_value): final_answer =
+  FinalVal(value)          
+let final_to_num (f:final_answer) : int =
+  match f with
+  | FinalVal(x) -> expval_to_num x
+  | _ ->  raise Invalid
+  
 let procedure (v:var) (body:expression) (environment:env) : procedure = 
   {var = v;
    body = body;
    saved_env = environment;}
   
 
-  
 let rec apply_cont (c: continuation) (v: exp_value) : final_answer =
   match c with 
-  | End_cont -> (Printf.printf "End of computation." ) ; ExpVal v
+  | End_cont -> (Printf.printf "End of computation." ) ; FinalVal v
   | Zero1_cont(saved_cont) -> apply_cont saved_cont (bool_val(if expval_to_num v = 0 then true else false))
   | Let_exp_cont(var, body,saved_env, saved_cont) -> 
       value_of_k body (extend_env var v saved_env) saved_cont
@@ -127,7 +131,7 @@ let example_run () =
                                              Let_exp("g", Proc_exp("z", Diff_exp(Var_exp("z"), Var_exp("x"))),
                                                      Diff_exp(Call_exp(Var_exp("f"),Const_exp(1)),
                                                               Call_exp(Var_exp("g"),Const_exp(1)))))))) in
-  print_int (expval_to_finalanswer(value_of_program p)  )
+  print_int (final_to_num(value_of_program (p)))
 
 let () = example_run()
 
