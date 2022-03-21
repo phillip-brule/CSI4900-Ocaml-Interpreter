@@ -17,7 +17,7 @@ let rec apply_env (e:env) (search_variable:var) : value =
 (* LET program structure *)
 type program = Expression of expression
 
-(* maybe use records?? to label the touples *)
+(* Specification of Values *)
 type expression = 
 	| Zero_exp of expression
 	| Const_exp of int
@@ -26,7 +26,6 @@ type expression =
 	| If_exp of expression * expression * expression
 	| Let_exp of var * expression * expression
 
-(* Specification of Values *)
 type exp_value = ExpVal of int | ExpVal of bool
 type den_value = DenVal of int | DenVal of bool
 
