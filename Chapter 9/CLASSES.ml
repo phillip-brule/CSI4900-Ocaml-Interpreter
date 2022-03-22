@@ -113,7 +113,7 @@ let new_object (class_n:var) : object_inst =
 	let field_list = newref (class_to_field_names (lookup_class class_n)) in
 	{
 		class_name = class_n;
-		fields = field_list
+		fields = field_list;
 	}
 
 

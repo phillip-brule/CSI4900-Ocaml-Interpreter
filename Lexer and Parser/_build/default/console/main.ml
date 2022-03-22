@@ -9,32 +9,29 @@ let write_prompt () = printf "Type in the program you would like to evaluate bel
 
 let write_program () = 
 	write_prompt ();
-	Unix.sleep 10; (*give 10s to write input but doesnt let you type anyways*)
-	let program = Scanf.scanf "%! %S" (fun x -> interp x) in 
-		print_string program
+	let program = read_line () in
+		print_string (interp program)
 
-let file () = printf "place holder";
+let file () = printf "Type in file name below: \n";
 	let program = ref "" in 
-		let channel = open_in file in
+		let channel = open_in (read_line ()) in
 	try
 		while true; do 
 			program := String.concat !program [""; (input_line channel)]
-		done; !program
-	with End_of_file ->
+		done
+	with End_of_file -> 
 		close_in channel;
-		print_string (interp !program)
-
-
+		print_string (interp (!program))
 
 
 let rec init () = 
 	initial_prompt ();
-	let write_or_file = Scanf.scanf "%s" (fun x -> x) in 
+	let write_or_file = read_line () in 
 		match write_or_file with
 		| "W" -> write_program ()
 		| "F" -> file ()
-		| _ -> printf "Sorry invalid response."; init ()
+		| _ -> printf "Sorry invalid response.\n"; init ()
 
 
 
-let _ = init ()
+let () = init ()

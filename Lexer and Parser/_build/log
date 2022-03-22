@@ -1,9 +1,9 @@
-# C:\OCaml64\home\Phillip\.opam\4.13.1+mingw64c\bin\dune.exe build
+# C:\OCaml64\home\Phillip\.opam\4.13.1+mingw64c\bin\dune.exe exec console/main.exe
 # OCAMLPARAM: unset
 # Workspace root: "C:\\OCaml64\\home\\Phillip\\Lexer and Parser"
 # Auto-detected concurrency: 8
 # disable binary cache
-$ C:\OCaml64\home\Phillip\.opam\4.13.1+mingw64c\bin\ocamlc.opt.exe -config > C:\OCaml64\tmp\dunefb4bc6.output
+$ C:\OCaml64\home\Phillip\.opam\4.13.1+mingw64c\bin\ocamlc.opt.exe -config > C:\OCaml64\tmp\dune123005.output
 # Dune context:
 #  { name = "default"
 #  ; kind = "default"
@@ -132,33 +132,4 @@ $ C:\OCaml64\home\Phillip\.opam\4.13.1+mingw64c\bin\ocamlc.opt.exe -config > C:\
 #      ; windows_unicode = true
 #      }
 #  }
-$ (cd _build/default && C:\OCaml64\home\Phillip\.opam\4.13.1+mingw64c\bin\ocamldep.opt.exe -modules -impl src/LETREC.ml) > _build/default/src/.interp.objs/LETREC.ml.d
-$ (cd _build/default && C:\OCaml64\home\Phillip\.opam\4.13.1+mingw64c\bin\ocamlc.opt.exe -w @1..3@5..28@30..39@43@46..47@49..57@61..62-40 -strict-sequence -strict-formats -short-paths -keep-locs -g -bin-annot -I src/.interp.objs/byte -no-alias-deps -opaque -open Interp -o src/.interp.objs/byte/interp__LETREC.cmo -c -impl src/LETREC.ml)
-$ (cd _build/default && C:\OCaml64\home\Phillip\.opam\4.13.1+mingw64c\bin\ocamlc.opt.exe -w @1..3@5..28@30..39@43@46..47@49..57@61..62-40 -strict-sequence -strict-formats -short-paths -keep-locs -g -I src/.interp.objs/byte -open Interp -short-paths -i -impl src/parser__mock.ml.mock) > _build/default/src/parser__mock.mli.inferred
-$ (cd _build/default && C:\OCaml64\home\Phillip\.opam\4.13.1+mingw64c\bin\menhir.exe src/parser.mly --base src/parser --infer-read-reply src/parser__mock.mli.inferred)
-> Warning: 6 states have shift/reduce conflicts.
-> Warning: 6 shift/reduce conflicts were arbitrarily resolved.
-$ (cd _build/default && C:\OCaml64\home\Phillip\.opam\4.13.1+mingw64c\bin\ocamldep.opt.exe -modules -intf src/parser.mli) > _build/default/src/.interp.objs/parser.mli.d
-$ (cd _build/default && C:\OCaml64\home\Phillip\.opam\4.13.1+mingw64c\bin\ocamldep.opt.exe -modules -impl src/parser.ml) > _build/default/src/.interp.objs/parser.ml.d
-$ (cd _build/default && C:\OCaml64\home\Phillip\.opam\4.13.1+mingw64c\bin\ocamlc.opt.exe -w @1..3@5..28@30..39@43@46..47@49..57@61..62-40 -strict-sequence -strict-formats -short-paths -keep-locs -g -bin-annot -I src/.interp.objs/byte -no-alias-deps -opaque -open Interp -o src/.interp.objs/byte/interp__Parser.cmi -c -intf src/parser.mli)
-$ (cd _build/default && C:\OCaml64\home\Phillip\.opam\4.13.1+mingw64c\bin\ocamlc.opt.exe -w @1..3@5..28@30..39@43@46..47@49..57@61..62-40 -strict-sequence -strict-formats -short-paths -keep-locs -g -bin-annot -I src/.interp.objs/byte -no-alias-deps -opaque -open Interp -o src/.interp.objs/byte/interp__Lexer.cmo -c -impl src/lexer.ml)
-$ (cd _build/default && C:\OCaml64\home\Phillip\.opam\4.13.1+mingw64c\bin\ocamlc.opt.exe -w @1..3@5..28@30..39@43@46..47@49..57@61..62-40 -strict-sequence -strict-formats -short-paths -keep-locs -g -bin-annot -I src/.interp.objs/byte -no-alias-deps -opaque -open Interp -o src/.interp.objs/byte/interp__Main.cmo -c -impl src/main.ml)
-$ (cd _build/default && C:\OCaml64\home\Phillip\.opam\4.13.1+mingw64c\bin\ocamlc.opt.exe -w @1..3@5..28@30..39@43@46..47@49..57@61..62-40 -strict-sequence -strict-formats -short-paths -keep-locs -g -bin-annot -I src/.interp.objs/byte -intf-suffix .ml -no-alias-deps -opaque -open Interp -o src/.interp.objs/byte/interp__Parser.cmo -c -impl src/parser.ml)
-$ (cd _build/default && C:\OCaml64\home\Phillip\.opam\4.13.1+mingw64c\bin\ocamlc.opt.exe -w @1..3@5..28@30..39@43@46..47@49..57@61..62-40 -strict-sequence -strict-formats -short-paths -keep-locs -g -a -o src/interp.cma src/.interp.objs/byte/interp.cmo src/.interp.objs/byte/interp__LETREC.cmo src/.interp.objs/byte/interp__Parser.cmo src/.interp.objs/byte/interp__PROC_Implementation.cmo src/.interp.objs/byte/interp__Lexer.cmo src/.interp.objs/byte/interp__Main.cmo)
-$ (cd _build/default && C:\OCaml64\home\Phillip\.opam\4.13.1+mingw64c\bin\ocamlopt.opt.exe -w @1..3@5..28@30..39@43@46..47@49..57@61..62-40 -strict-sequence -strict-formats -short-paths -keep-locs -g -I src/.interp.objs/byte -I src/.interp.objs/native -intf-suffix .ml -no-alias-deps -opaque -open Interp -o src/.interp.objs/native/interp__LETREC.cmx -c -impl src/LETREC.ml)
-$ (cd _build/default && C:\OCaml64\home\Phillip\.opam\4.13.1+mingw64c\bin\ocamlopt.opt.exe -w @1..3@5..28@30..39@43@46..47@49..57@61..62-40 -strict-sequence -strict-formats -short-paths -keep-locs -g -I src/.interp.objs/byte -I src/.interp.objs/native -intf-suffix .ml -no-alias-deps -opaque -open Interp -o src/.interp.objs/native/interp__Lexer.cmx -c -impl src/lexer.ml)
-$ (cd _build/default && C:\OCaml64\home\Phillip\.opam\4.13.1+mingw64c\bin\ocamlopt.opt.exe -w @1..3@5..28@30..39@43@46..47@49..57@61..62-40 -strict-sequence -strict-formats -short-paths -keep-locs -g -I src/.interp.objs/byte -I src/.interp.objs/native -intf-suffix .ml -no-alias-deps -opaque -open Interp -o src/.interp.objs/native/interp__Main.cmx -c -impl src/main.ml)
-$ (cd _build/default && C:\OCaml64\home\Phillip\.opam\4.13.1+mingw64c\bin\ocamlopt.opt.exe -w @1..3@5..28@30..39@43@46..47@49..57@61..62-40 -strict-sequence -strict-formats -short-paths -keep-locs -g -I src/.interp.objs/byte -I src/.interp.objs/native -intf-suffix .ml -no-alias-deps -opaque -open Interp -o src/.interp.objs/native/interp__Parser.cmx -c -impl src/parser.ml)
-$ (cd _build/default && C:\OCaml64\home\Phillip\.opam\4.13.1+mingw64c\bin\ocamlopt.opt.exe -w @1..3@5..28@30..39@43@46..47@49..57@61..62-40 -strict-sequence -strict-formats -short-paths -keep-locs -g -a -o src/interp.cmxa src/.interp.objs/native/interp.cmx src/.interp.objs/native/interp__LETREC.cmx src/.interp.objs/native/interp__Parser.cmx src/.interp.objs/native/interp__PROC_Implementation.cmx src/.interp.objs/native/interp__Lexer.cmx src/.interp.objs/native/interp__Main.cmx)
-$ (cd _build/default && C:\OCaml64\home\Phillip\.opam\4.13.1+mingw64c\bin\ocamlc.opt.exe -w @1..3@5..28@30..39@43@46..47@49..57@61..62-40 -strict-sequence -strict-formats -short-paths -keep-locs -g -bin-annot -I console/.main.eobjs/byte -I C:\\OCaml64\\home\\Phillip\\.opam\\4.13.1+mingw64c\lib\bytes -I C:\\OCaml64\\home\\Phillip\\.opam\\4.13.1+mingw64c\lib\ounit2 -I C:\\OCaml64\\home\\Phillip\\.opam\\4.13.1+mingw64c\lib\ounit2\advanced -I C:\\OCaml64\\home\\Phillip\\.opam\\4.13.1+mingw64c\lib\stdlib-shims -I src/.interp.objs/byte -no-alias-deps -opaque -o console/.main.eobjs/byte/dune__exe__Main.cmo -c -impl console/main.ml)
-> File "console/main.ml", line 18, characters 24-28:
-> 18 | 		let channel = open_in file in
->                              ^^^^
-> Error: Unbound value file
-> Hint: If this is a recursive definition,
-> you should add the 'rec' keyword on line 16
-[2]
-$ (cd _build/default && C:\OCaml64\home\Phillip\.opam\4.13.1+mingw64c\bin\ocamlc.opt.exe -w @1..3@5..28@30..39@43@46..47@49..57@61..62-40 -strict-sequence -strict-formats -short-paths -keep-locs -g -bin-annot -I test/.main.eobjs/byte -I C:\\OCaml64\\home\\Phillip\\.opam\\4.13.1+mingw64c\lib\bytes -I C:\\OCaml64\\home\\Phillip\\.opam\\4.13.1+mingw64c\lib\ounit2 -I C:\\OCaml64\\home\\Phillip\\.opam\\4.13.1+mingw64c\lib\ounit2\advanced -I C:\\OCaml64\\home\\Phillip\\.opam\\4.13.1+mingw64c\lib\stdlib-shims -I src/.interp.objs/byte -no-alias-deps -opaque -o test/.main.eobjs/byte/dune__exe__Main.cmo -c -impl test/main.ml)
-$ (cd _build/default && C:\OCaml64\home\Phillip\.opam\4.13.1+mingw64c\bin\ocamlopt.opt.exe -w @1..3@5..28@30..39@43@46..47@49..57@61..62-40 -strict-sequence -strict-formats -short-paths -keep-locs -g -I test/.main.eobjs/byte -I test/.main.eobjs/native -I C:\\OCaml64\\home\\Phillip\\.opam\\4.13.1+mingw64c\lib\bytes -I C:\\OCaml64\\home\\Phillip\\.opam\\4.13.1+mingw64c\lib\ounit2 -I C:\\OCaml64\\home\\Phillip\\.opam\\4.13.1+mingw64c\lib\ounit2\advanced -I C:\\OCaml64\\home\\Phillip\\.opam\\4.13.1+mingw64c\lib\stdlib-shims -I src/.interp.objs/byte -I src/.interp.objs/native -intf-suffix .ml -no-alias-deps -opaque -o test/.main.eobjs/native/dune__exe__Main.cmx -c -impl test/main.ml)
-$ (cd _build/default && C:\OCaml64\home\Phillip\.opam\4.13.1+mingw64c\bin\ocamlopt.opt.exe -w @1..3@5..28@30..39@43@46..47@49..57@61..62-40 -strict-sequence -strict-formats -short-paths -keep-locs -g -shared -linkall -I src -o src/interp.cmxs src/interp.cmxa)
-$ (cd _build/default && C:\OCaml64\home\Phillip\.opam\4.13.1+mingw64c\bin\ocamlopt.opt.exe -w @1..3@5..28@30..39@43@46..47@49..57@61..62-40 -strict-sequence -strict-formats -short-paths -keep-locs -g -o test/main.exe src/interp.cmxa C:/OCaml64/home/Phillip/.opam/4.13.1+mingw64c/lib/ocaml\unix.cmxa -I C:/OCaml64/home/Phillip/.opam/4.13.1+mingw64c/lib/ocaml C:\\OCaml64\\home\\Phillip\\.opam\\4.13.1+mingw64c\lib\stdlib-shims\stdlib_shims.cmxa C:\\OCaml64\\home\\Phillip\\.opam\\4.13.1+mingw64c\lib\ounit2\advanced/oUnitAdvanced.cmxa C:\\OCaml64\\home\\Phillip\\.opam\\4.13.1+mingw64c\lib\ounit2\oUnit.cmxa test/.main.eobjs/native/dune__exe__Main.cmx)
+# Workspace root: "C:\\OCaml64\\home\\Phillip\\Lexer and Parser"
