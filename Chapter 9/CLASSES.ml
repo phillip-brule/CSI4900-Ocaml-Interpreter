@@ -1,6 +1,6 @@
 
 exception Invalid
-(* Specification of Values *)
+(*---------- Specification of Values -----------------*)
 type reference = int
 type var = string 
 type expression = 
@@ -16,7 +16,7 @@ type expression =
   | Letrec_exp of var * var * expression * expression (*proc-name bound-variable proc-body letrec-body*)
   | Begin_exp of expression list
   | New_object_exp of var * expression list
-  | Method_call_exp of expression * var * expression list
+  | Method_call_exp of expression * var * expression list (*send expression*)
   | Super_call_exp of var * expression list
   | Self_exp
 
@@ -40,18 +40,11 @@ type procedure = {
 	body : expression;
 	saved_env : env;
 }
+
 and env = Empty_env | Extend_env of var * reference * env | Extend_env_rec of var * var * expression * env 
-and exp_value = ExpVal of int | ExpBool of bool | Proc of procedure | ExpValList of exp_value list | Obj of object
+and exp_value = ExpVal of int | ExpBool of bool | Proc of procedure | ExpValList of exp_value list | Obj of object_inst
 
 type den_value = Ref of reference
-let empty_env () : env = Empty_env
-
-let extend_env (v:var) (refNum:reference) (e:env) : env = 
-  Extend_env(v, refNum, e)
-let extend_env_rec (proc_name:var) (bound_var:var) (proc_body:expression) (e:env) : env = 
-	Extend_env_rec(proc_name, bound_var, proc_body, e)
-
-                                                       
 
 (* an array may not the best use for this because everytime an end insert is need, in order to append
 to the end of the array ocaml will reconstruct a new array and return a new array rather than just
@@ -66,15 +59,34 @@ mutable record is that other fields that describe the store could be added later
 type store = {mutable store : exp_value array}
 
 
+type object_inst = {
+	class_name : var;
+	fields : reference list;
+}
+
+
+(* -------Helper Functions for Data Types------------- *)
+
+let empty_env () : env = Empty_env
+
+let extend_env (v:var) (refNum:reference) (e:env) : env = 
+  Extend_env(v, refNum, e)
+let extend_env_rec (proc_name:var) (bound_var:var) (proc_body:expression) (e:env) : env = 
+	Extend_env_rec(proc_name, bound_var, proc_body, e)
+
 let empty_store () : store = 
 	let (listOfReferences: exp_value array) = [||] in
 		{store = listOfReferences;}
 
-
 (* initialize store *)
 let global_store = empty_store()
 
-    
+ 
+let procedure (v:var) (body:expression) (environment:env) : procedure = 
+  {var = v;
+  body = body;
+  saved_env = environment;}
+
 let num_val (i:int) : exp_value = 
   ExpVal(i)
 let bool_val (b:bool) : exp_value = 
@@ -97,10 +109,13 @@ let expval_to_proc (value:exp_value) : procedure =
   | _ -> raise Invalid
 
 
-let procedure (v:var) (body:expression) (environment:env) : procedure = 
-  {var = v;
-  body = body;
-  saved_env = environment;}
+let new_object (class_n:var) : object_inst = 
+	let field_list = newref (class_to_field_names (lookup_class class_n)) in
+	{
+		class_name = class_n;
+		fields = field_list
+	}
+
 
 let rec apply_env(e:env) (search_v:var) : reference = 
   match e with
@@ -111,7 +126,7 @@ let rec apply_env(e:env) (search_v:var) : reference =
 		else apply_env envNext search_v
  
 
-(* Functions for referencing---------------------------------------------------- *)
+(*-----------------------Functions for referencing-------------------------- *)
 (* reference number is equal to its location *)
 let newref (value:exp_value)  : reference = 
 	global_store.store <- Array.append global_store.store [|value|];
@@ -135,7 +150,7 @@ let initialize_class_env = kkj
 
 
 
-
+(* -------------Evaluation-------------------- *)
 
 let rec value_of (exp:expression) (environment:env) : exp_value = 
 	match exp with
@@ -172,7 +187,17 @@ let rec value_of (exp:expression) (environment:env) : exp_value =
 		| [last_exp] -> value_of last_exp environment
 		| head :: tail -> let _throw = value_of head environment in (); 
 			value_of (Begin_exp(tail)) environment
-	end 
+	end
+	| Self_exp -> apply_env environment self (*self refers to the current bound object*)
+	| Method_call_exp(object_exp, method_name, operands) -> let args = values_of_exps operands environment in
+		let obj = value_of object_exp environment in
+			apply_method (find_method (object_to_class_name obj) method_name) obj args
+	| Super_call_exp(method_name, operands) -> let args = values_of_exps operands environment in
+		let obj = apply_env environment self in
+			apply_method (find_method (apply_env environment super) method_name) obj args
+	| New_object_exp(class_name, operands) -> let args = values_of_exps operands environment in
+		let obj = new_object class_name in 
+			let _throw = apply_method (find_method class_name (initialize_object ())) obj args in obj
 
 
 
@@ -184,20 +209,3 @@ let value_of_program (p:program) : exp_value =
   	let init_env = empty_env() in
   		value_of body init_env
 
-
-(* figure 4.8 on page 120 returns 12*)
-(* Note: to express parts of code that have procedures with multiple operations, Let expressions may be used for 
-each operation. The body of the final let expression will be the return value *)
-(* let f = proc (x) proc (y)
-	begin 
-		set x = -(x,-1);
-		-(x,y)
-	end 
-in ((f 44) 33) *)
-let example_run () = 
-	let p = Let_exp("f", Proc_exp("x", Proc_exp("y", 
-		Let_exp("result", Assign_exp("x", Diff_exp(Var_exp("x"), Const_exp(-1))), Diff_exp(Var_exp("x"), Var_exp("y")) ))),
-		Call_exp(Call_exp(Var_exp("f"),Const_exp(44)), Const_exp(33)))
-	in print_int (value_of_program (Expression(p))) 
-
-let () = example_run()
