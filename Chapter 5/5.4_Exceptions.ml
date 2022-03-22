@@ -141,7 +141,7 @@ let value_of/k (exp:expression) (environment:env ) (c:cont) : bounce =
 
 let apply_handler (exp: expression) (c: cont): final_answer =
   match c with
-  | try_cont(var, handler_exp, saved_env, saved_cont) -> value_of/k handler_exp (extend_env var, val1, saved_env) saved_cont
+  | try_cont(var, handler_exp, saved_env, saved_cont) -> value_of_k handler_exp (extend_env var, val1, saved_env) saved_cont
   | end_cont -> raise uncaught_exception
   | diff1_cont(exp2, saved_env, saved_cont) -> apply_handler val1 saved_cont
   | diff2_cont(val1, saved_cont) -> apply_handler val1 saved_cont
