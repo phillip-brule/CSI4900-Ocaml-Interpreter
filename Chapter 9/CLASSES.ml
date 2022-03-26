@@ -3,6 +3,8 @@ exception Invalid
 (*---------- Specification of Values -----------------*)
 type reference = int
 type var = string 
+type className = ClassName of var
+type methodName = MethodName of var
 type expression = 
   | Zero_exp of expression
   | Const_exp of int
@@ -17,20 +19,28 @@ type expression =
   | Begin_exp of expression list
   | New_object_exp of var * expression list
   | Method_call_exp of expression * var * expression list (*send expression*)
-  | Super_call_exp of var * expression list
+  | Super_call_exp of className * expression list
   | Self_exp
 
-type method_decls = {
-	method_name: var;
+
+
+type method_decl = {
+	method_name: methodName;
 	variables: var list;
 	body: expression;
 }
 
+(* class class_declaration *)
 type class_decl = {
-	class: var;
-	super_class: var;
+	class_name: className;
+	super_class: className;
 	field_names: var list;
 	method_decls: method_decl list;
+}
+
+type object_inst = {
+	class_name : className;
+	fields : reference list;
 }
 
 type program = Program of class_decl list * expression 
@@ -41,8 +51,8 @@ type procedure = {
 	saved_env : env;
 }
 
-and env = Empty_env | Extend_env of var * reference * env | Extend_env_rec of var * var * expression * env 
-and exp_value = ExpVal of int | ExpBool of bool | Proc of procedure | ExpValList of exp_value list | Obj of object_inst
+and env = Empty_env | Extend_env of var * reference * env | Extend_env_rec of var * var * expression * env | Extend_env_list of var list * reference list * env
+and exp_value = ExpVal of int | ExpBool of bool | Proc of procedure | EmptyObjField of var | Obj of object_inst | ObjField of exp_value * var
 
 type den_value = Ref of reference
 
@@ -58,14 +68,30 @@ extraneeous memory *)
 mutable record is that other fields that describe the store could be added later *)
 type store = {mutable store : exp_value array}
 
+(* object instance *)
 
-type object_inst = {
-	class_name : var;
-	fields : reference list;
+
+type methodType = {
+	vars : var list;
+	body : expression;
+	super_name : className;
+	field_names : var list;
 }
 
+type methodEnv = (methodName * methodType) list
+
+type classType = {
+	super_name : className;
+	field_names : var list;
+	method_env : methodEnv;
+}
+
+type classEnv = (className * classType) list
 
 (* -------Helper Functions for Data Types------------- *)
+
+(* initialize class environment *)
+let the_class_env : classEnv ref = ref []
 
 let empty_env () : env = Empty_env
 
@@ -73,15 +99,84 @@ let extend_env (v:var) (refNum:reference) (e:env) : env =
   Extend_env(v, refNum, e)
 let extend_env_rec (proc_name:var) (bound_var:var) (proc_body:expression) (e:env) : env = 
 	Extend_env_rec(proc_name, bound_var, proc_body, e)
+let extend_env_list (vars:var list) (values:reference list) (e:env) : env = 
+	Extend_env_list(vars, values, e)
 
 let empty_store () : store = 
 	let (listOfReferences: exp_value array) = [||] in
 		{store = listOfReferences;}
 
+let new_class (s_name:className) (f_names: var list) (m_env:methodEnv) : classType = 
+	{super_name = s_name;
+	field_names = f_names;
+	method_env = m_env;}
+
+let new_method (variables:var list) (new_body:expression) (s_name:className) (f_names:var list) : methodType = 
+	{vars = variables;
+	body = new_body;
+	super_name = s_name;
+	field_names = f_names;}
+
+let fresh_identifier (old_var_name:var) : var = 
+	if String.contains old_var_name '%' then (let s_new = String.split_on_char '%' old_var_name in 
+		match s_new with 
+		| [] -> "%1"
+		| var_name :: num_string :: _ -> let num =  int_of_string num_string in var_name ^ ("%" ^ (string_of_int (num + 1)))
+		| _ :: [] -> old_var_name ^ "%1"
+	) else old_var_name ^ "%1"
+
+
+let rec append_field_names (super_fields: var list) (new_fields: var list) : var list = 
+	match super_fields with
+	| [] -> new_fields
+	| head :: tail -> let new_tail = append_field_names tail new_fields in
+			if List.mem head new_fields then (fresh_identifier head) :: new_tail else head :: new_tail
+
+let add_to_class_env (class_n:className) (class_obj:classType) = 
+	the_class_env := (class_n,class_obj) :: !the_class_env
+
+let rec lookup_class (search_class_n:className) : classType = 
+	match (List.assoc_opt search_class_n !the_class_env) with 
+	| None -> raise Invalid
+	| Some(class_obj) -> class_obj
+
+(* exercise 9.18 to make merge method envs more efficient for look up and save memory space *)
+(* a method in the super environment is replaced with the method in the new environment if they have the same name 
+the new method should be placed in the same location as it was before *)
+let rec merge_method_envs (super_env:methodEnv) (new_env:methodEnv) : methodEnv = 
+	match super_env with 
+	| [] -> new_env
+	| (m_name, the_method) :: super_tail -> let same_method_name = List.assoc_opt m_name new_env in 
+		match same_method_name with 
+		| None -> super_env @ new_env (*concat the two lists together*)
+		| Some(new_method) -> (m_name, new_method) :: merge_method_envs super_tail (List.remove_assoc m_name new_env)
+
 (* initialize store *)
 let global_store = empty_store()
 
- 
+(* method functions *)
+let method_decls_to_method_env (m_decls:method_decl list) (s_name:className) (f_names:var list) : methodEnv = 
+	List.map (fun (m_decl:method_decl) -> (m_decl.method_name, (new_method m_decl.variables m_decl.body s_name f_names)))
+	m_decls
+let find_method (c_name:className) (search_v:methodName) : methodType = 
+	let the_class = lookup_class c_name in
+		let m_env = the_class.method_env in
+			let found = List.assoc_opt search_v m_env in
+				match found with 
+				| Some(the_method) -> the_method
+				| None -> raise Invalid
+
+(* creationg of the super class for all classes called object *)
+let initialize_class_decl (class_declaration:class_decl) =
+	let super_class = lookup_class class_declaration.super_class in
+		let f_names = append_field_names (super_class.field_names) class_declaration.field_names in 
+			add_to_class_env class_declaration.class_name (new_class class_declaration.super_class f_names (merge_method_envs super_class.method_env 
+				(method_decls_to_method_env class_declaration.method_decls class_declaration.super_class f_names)))
+let initialize_class_env (class_declarations:class_decl list) = 
+	the_class_env := (ClassName("object"), { super_name = ClassName("#f"); field_names = []; method_env = [];}) :: !the_class_env;
+	List.iter initialize_class_decl class_declarations
+
+
 let procedure (v:var) (body:expression) (environment:env) : procedure = 
   {var = v;
   body = body;
@@ -109,24 +204,6 @@ let expval_to_proc (value:exp_value) : procedure =
   | _ -> raise Invalid
 
 
-let new_object (class_n:var) : object_inst = 
-	let field_list = newref (class_to_field_names (lookup_class class_n)) in
-	{
-		class_name = class_n;
-		fields = field_list;
-	}
-
-
-let rec apply_env(e:env) (search_v:var) : reference = 
-  match e with
-  | Empty_env -> raise Invalid
-  | Extend_env(variable, value, envNext) -> if variable = search_v then value 
-		else apply_env envNext search_v
-	| Extend_env_rec(proc_name, bound_var, proc_body, envNext) -> if proc_name = search_v then proc_val (procedure bound_var proc_body e)
-		else apply_env envNext search_v
- 
-
-(*-----------------------Functions for referencing-------------------------- *)
 (* reference number is equal to its location *)
 let newref (value:exp_value)  : reference = 
 	global_store.store <- Array.append global_store.store [|value|];
@@ -144,9 +221,27 @@ let setref (refNum: reference) (value: exp_value) : bool =
 		Invalid_argument(_) -> false
 
 
-let initialize_class_env = kkj
+let rec apply_env(e:env) (search_v:var) : reference = 
+  match e with
+  | Empty_env -> raise Invalid
+  | Extend_env(variable, value, envNext) -> if variable = search_v then value 
+		else apply_env envNext search_v
+	| Extend_env_rec(proc_name, bound_var, proc_body, envNext) -> if proc_name = search_v then newref (proc_val (procedure bound_var proc_body e))
+		else apply_env envNext search_v
+	| Extend_env_list(vars, values, envNext) -> 
+		match values with
+		| [] -> apply_env envNext search_v
+		| value_head :: value_tail ->
+			match vars with
+			| [] -> apply_env envNext search_v
+			| head :: tail -> if head = search_v then value_head else apply_env (extend_env_list tail value_tail envNext) search_v
 
-
+let new_object (class_n:className) : object_inst = 
+	let field_list = let the_class =  lookup_class class_n in List.map (fun f_name -> newref (EmptyObjField(f_name))) the_class.field_names in
+	{
+		class_name = class_n;
+		fields = field_list;
+	}
 
 
 
@@ -199,6 +294,10 @@ let rec value_of (exp:expression) (environment:env) : exp_value =
 		let obj = new_object class_name in 
 			let _throw = apply_method (find_method class_name (initialize_object ())) obj args in obj
 
+
+and apply_method (m:methodType) (self:object_inst) (args:exp_value list) : exp_value = 
+	value_of m.body (extend_env_list m.vars (List.map newref args) 
+		extend_env_with_self_and_super self m.super_name (extend_env m.field_names self.fields (empty_env ())))
 
 
 
