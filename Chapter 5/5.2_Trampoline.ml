@@ -11,6 +11,8 @@ type expression =
   | Let_exp of var * expression * expression
   | Proc_exp of var * expression
   | Call_exp of expression * expression  (* operator operand *)
+  | Letrec_exp of var * var * expression * expression (*proc-name bound-variable proc-body letrec-body*)
+  | Begin_exp of expression list
 
 type procedure = {
   var : var;
@@ -19,7 +21,7 @@ type procedure = {
 }
 
 
-and env = Empty_env | Extend_env of var * exp_value * env
+and env = Empty_env | Extend_env of var * exp_value * env| Extend_env_rec of var * var * expression * env 
 
 and exp_value = ExpVal of int | ExpBool of bool | Proc of procedure
                                                         
@@ -43,6 +45,9 @@ let empty_env () : env = Empty_env
 
 let extend_env (v:var) (value:exp_value) (e:env) : env = 
   Extend_env(v, value, e)
+    
+let extend_env_rec (proc_name:var) (bound_var:var) (proc_body:expression) (e:env) : env = 
+  Extend_env_rec(proc_name, bound_var, proc_body, e)
 
 let rec apply_env(e:env) (search_v:var) : exp_value = 
   match e with
@@ -58,7 +63,6 @@ let bool_val (b:bool) : exp_value =
 let proc_val (p:procedure) : exp_value = 
   Proc(p)
     
-
 let expval_to_num (value:exp_value) : int = 
   match value with
   | ExpVal(i) -> i
@@ -77,7 +81,7 @@ let final_to_num (f:final_answer) : int =
   match f with
   | FinalVal(x) -> expval_to_num x
   | _ ->  raise Invalid
-
+            
 let procedure (v:var) (body:expression) (environment:env) : procedure = 
   {var = v;
    body = body;
@@ -106,6 +110,7 @@ and value_of_k (exp:expression) (environment:env ) (c:continuation) : bounce =
   | Const_exp(num) -> apply_cont c (num_val num)
   | Var_exp(var) -> apply_cont c (apply_env environment var)
   | Proc_exp(var, body) -> apply_cont c (proc_val (procedure var body environment))
+  | Letrec_exp(proc_name, bound_var, proc_body, letrec_body) -> value_of_k letrec_body (extend_env_rec proc_name bound_var proc_body environment) c 
   | Zero_exp(exp1)-> value_of_k exp1 environment (Zero1_cont c)
   | Let_exp(var, exp1, body)-> value_of_k exp1 environment (Let_exp_cont(var,body,environment,c))
   | If_exp(exp1, exp2, exp3)-> value_of_k exp1 environment (If_test_cont(exp2,exp3,environment,c))
@@ -134,6 +139,6 @@ let example_run () =
                                              Let_exp("g", Proc_exp("z", Diff_exp(Var_exp("z"), Var_exp("x"))),
                                                      Diff_exp(Call_exp(Var_exp("f"),Const_exp(1)),
                                                               Call_exp(Var_exp("g"),Const_exp(1)))))))) in
-  print_int(value_of_program(p))
+  print_int(final_to_num(value_of_program(p)))
 
 let () = example_run()

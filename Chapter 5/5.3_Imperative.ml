@@ -37,9 +37,32 @@ type continuation =
   | Diff2_cont of exp_value*continuation
   | Rator_cont of expression*env*continuation
   | Rand_cont of exp_value*continuation
+                 
+(*type state = 
+  | Cont of continuation
+  | Envn of env
+  | Exp of expression
+  | Value of exp_value
+  | Proc1 of procedure*)
+      
+type state = 
+  | Cont 
+  | Envn 
+  | Exp 
+  | Value 
+  | Proc1 
 
 let empty_env () : env = Empty_env
 
+
+
+(* type state = {
+  cont : continuation ref;
+  exp : expression ref;
+  envn : env ref;
+  value : exp_value ref;
+  proc1 : procedure ref};; *)
+  
 let extend_env (v:var) (value:exp_value) (e:env) : env = 
   Extend_env(v, value, e)
 
@@ -83,60 +106,99 @@ let procedure (v:var) (body:expression) (environment:env) : procedure =
    body = body;
    saved_env = environment;}
 
-let rec apply_cont (c: continuation) (v: exp_value) : final_answer =
-  match c with 
-  | End_cont -> (Printf.printf "End of computation." ) ; FinalVal v
-  | Zero1_cont(saved_cont) -> apply_cont saved_cont (bool_val(if expval_to_num v = 0 then true else false))
-  | Let_exp_cont(var, body,saved_env, saved_cont) -> 
-      value_of_k body (extend_env var v saved_env) saved_cont
-  | If_test_cont(exp2, exp3, saved_env, saved_cont) -> if expval_to_bool v then 
-        value_of_k exp2 saved_env saved_cont else value_of_k exp3 saved_env saved_cont 
-  | Diff1_cont(exp2, saved_env, saved_cont) -> value_of_k exp2 saved_env (Diff2_cont (v, saved_cont))
-  | Diff2_cont(value, saved_cont) -> let num1 = expval_to_num value in
-      let num2 = expval_to_num v in apply_cont saved_cont (num_val(num1 - num2))
-  | Rator_cont(rand, saved_env, saved_cont) -> value_of_k rand saved_env (Rand_cont(v, saved_cont)) 
-  | Rand_cont(value, saved_cont) -> let proc1 = expval_to_proc value in
-      apply_procedure_k proc1 v saved_cont
+(* let state (c:continuation) (ex:expression) (environment:env) (v:exp_value) (p:procedure): state =
+  {cont = ref c ;
+   exp = ref ex;
+   envn = ref environment;
+   value = ref v;
+   proc1= ref p;} 
+*)
+let cont = ref Cont
+let exp = ref Exp
+let envn = ref Envn
+let value = ref Value
+let proc1 = ref Proc1
 
+let rec apply_cont () : final_answer =
+  match !state.cont with 
+  | End_cont -> (Printf.printf "End of computation." ) ; FinalVal value
+  | Zero1_cont(saved_cont) -> 
+      (state.cont) := saved_cont;
+      (state.value) := bool_val(if expval_to_num !(state.value) = 0 then true else false);
+      apply_cont
+  | Let_exp_cont(var, body, saved_env, saved_cont) -> 
+      (state.cont) := saved_cont;
+      (state.exp) := body;
+      (state.envn) := extend_env var !(state.value) saved_env;
+      value_of_k
+  | If_test_cont(exp2, exp3, saved_env, saved_cont) -> 
+      (state.cont) := saved_cont; 
+      if expval_to_bool !(state.value) then 
+        (state.exp) := exp2 else (state.exp):= exp3 ;
+      (state.envn) := saved_env; 
+      value_of_k
+  | Diff1_cont(exp2, saved_env, saved_cont) -> 
+      (state.cont) := Diff2_cont (!(saved.value) saved_cont);
+      (state.exp) := exp2;
+      (state.envn) := saved_env; 
+      value_of_k 
+  | Diff2_cont(val1, saved_cont) -> 
+      let num1 = expval_to_num val1 in
+      let num2 = expval_to_num !(state.value) in 
+      (state.cont) := saved_cont;
+      (state.value) := num_val(num1-num2);
+      apply_cont
+  | Rator_cont(rand, saved_env, saved_cont) -> 
+      (state.cont):= Rand_cont (!(state.value) saved_cont);
+      (state.exp) := rand;
+      (state.envn) := saved_env; 
+      value_of_k
+  | Rand_cont(rator_val, saved_cont) -> let rator_proc = expval_to_proc rator_val in
+      (state.cont) := saved_cont;
+      (state.proc1) := rator_proc;
+      (state.value) := !(state.value);
+      apply_procedure_k 
 
-let trampoline (b:bounce) : final_answer =
-  if exp_val =  b then b else trampoline b
+  
 
 let value_of_program (p:program) : final_answer = 
   match p with
   | Expression(exp1) -> let init_env = empty_env() in
       let end_c = End_cont in 
-      (set! cont end_c)
-        (set! exp exp1)
-        (set ! environment init_env)
-        (value_of_k)
-      (* expval_to_num (trampoline (value_of_k exp1 init_env end_c)) *)
+      (state.cont) := end_c; 
+      (state.exp) :=  exp1;
+      (state.envn):= init_env;
+      value_of_k
+  
+    
+let apply_procedure_k () : final_answer =
+  match !(state.proc1) with
+  | procedure(var, body, saved_env) -> 
+      (state.exp) := body;
+      (state.envn) := extend_env var !(state.value) saved_env;
+      value_of_k
 
 
-let  apply_procedure_k (p:procedure) (value:exp_value) (c:cont) : bounce =
-  value_of_k p.body (extend_env p.var value  p.saved_env ) c 
-
-and value_of_k (exp:expression) (environment:env ) (c:cont) : bounce =
-  match exp with
-  | Const_exp(num) -> (set! c c) (set! value (num_val num)) (apply_cont)
-  | Var_exp(var) -> (apply_cont c (apply_env environment var))
-  | Proc_exp(var, body) -> (apply_cont c (proc_val (procedure var body environment)))
-  | Zero_exp(exp1)-> (value_of_k exp1 environment (zero1_cont c))
-  | Let_exp(var, exp1, body)-> (value_of_k exp1 environment (let_exp_cont var bodyenv c))
-  | If_exp(exp1, exp2, exp3)-> (value_of_k exp1 environment (if_test_cont exp2 exp3 environment c ))
-  | Diff_exp(exp1, exp2)-> (value_of_k exp1 environment (diff1_cont exp2 environment c))
-  | Call_exp(rator, rand)-> (value_of_k rator environment (rator_cont rand environment c))
-
-
-(* let run (s:string) : int = 
-  s |> scan_and_parse |> value_of_program *)
-
-(* Example run found on page 77 with return value of -100 *)
-(* let x = 200
-	in let f = proc (z) -(z,x)
-		in let x = 100
-			in let g = proc (z) -(z,x)
-				in -((f 1), (g 1)) *)
+let rec value_of_k () : final_answer = 
+  match !(state.exp) with
+  | Const_exp(num) -> (state.value) := num_val num ; apply_cont
+  | Var_exp(var) -> (state.value) := apply_env !(state.env) var; apply_cont
+  | Proc_exp(var, body) -> (state.value) := proc_val (procedure var body !(state.env))
+  | Zero_exp(exp) -> (state.cont) := Zero1_cont cont ; (state.exp) := exp ; value_of_k
+  | Let_exp(var, exp, body) -> 
+      (state.cont) := Let_exp_cont var body !(state.env) !(state.cont) ; 
+      (state.exp) := exp
+  | If_exp(exp1, exp2, exp3) -> 
+      (state.cont) := Let_test_cont exp2 exp3 !(state.env) !(state.cont); 
+      (state.exp) := exp1 ; value_of_k
+  | Diff_exp(exp1, exp2) ->
+      (state.cont) := Diff1_cont exp2 !(state.env) !(state.cont) ;
+      (state.exp) := exp1 ; value_of_k
+  | Call_exp(rator, rand) ->
+      (state.cont) := Rator_cont rand !(state.env) !(state.cont) ;
+      (state.exp) := rator; value_of_k
+      
+  
 
 let example_run () = 
   let p = Expression(Let_exp("x", Const_exp(200), 

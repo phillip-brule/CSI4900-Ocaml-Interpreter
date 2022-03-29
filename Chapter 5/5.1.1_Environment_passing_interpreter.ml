@@ -17,6 +17,8 @@ type expression =
   | Let_exp of var * expression * expression
   | Proc_exp of var * expression
   | Call_exp of expression * expression  (* operator operand *)
+  | Letrec_exp of var * var * expression * expression (*proc-name bound-variable proc-body letrec-body*)
+  | Begin_exp of expression list
 
 type procedure = {
   var : var;
@@ -24,13 +26,13 @@ type procedure = {
   saved_env : env;
 }
 
-and env = Empty_env | Extend_env of var * exp_value * env
+and env = Empty_env | Extend_env of var * exp_value * env | Extend_env_rec of var * var * expression * env 
 
 and exp_value = ExpVal of int | ExpBool of bool | Proc of procedure
                                                         
 type program = Expression of expression 
 
-type final_answer = Exp of exp_value
+type final_answer = FinalVal of exp_value
 
 type cont = exp_value -> final_answer
 
@@ -38,6 +40,9 @@ let empty_env () : env = Empty_env
 
 let extend_env (v:var) (value:exp_value) (e:env) : env = 
   Extend_env(v, value, e)
+    
+let extend_env_rec (proc_name:var) (bound_var:var) (proc_body:expression) (e:env) : env = 
+  Extend_env_rec(proc_name, bound_var, proc_body, e)
 
 let rec apply_env(e:env) (search_v:var) : exp_value = 
   match e with
@@ -66,7 +71,11 @@ let expval_to_proc (value:exp_value) : procedure =
   | Proc(p) -> p
   | _ -> raise Invalid
 let expval_to_finalanswer (value:exp_value): final_answer =
-  Exp(value)
+  FinalVal(value) 
+let final_to_num (f:final_answer) : int =
+  match f with
+  | FinalVal(x) -> expval_to_num x
+  | _ ->  raise Invalid
            
 
 let procedure (v:var) (body:expression) (environment:env) : procedure = 
@@ -105,7 +114,16 @@ let rec value_of (exp:expression) (environment:env) : exp_value =
       let apply_procedure (p:procedure) (value:exp_value) : exp_value = 
         value_of p.body (extend_env p.var value p.saved_env) in
       apply_procedure proc arg
-  
+  | Letrec_exp(proc_name, bound_var, proc_body, letrec_body) -> 
+      let newEnv = extend_env_rec proc_name bound_var proc_body environment in
+      value_of letrec_body newEnv
+  | Begin_exp(exp_list) ->
+      begin match exp_list with
+        | [] -> raise Invalid
+        | [last_exp] -> value_of last_exp environment
+        | head :: tail -> let _throw = value_of head environment in (); 
+            value_of (Begin_exp(tail)) environment
+      end 
   
 let value_of_program (p:program) : final_answer = 
   match p with
@@ -120,6 +138,6 @@ let example_run () =
                                               Let_exp("g", Proc_exp("z", Diff_exp(Var_exp("z"), Var_exp("x"))),
                                                       Diff_exp(Call_exp(Var_exp("f"),Const_exp(1)),
                                                                Call_exp(Var_exp("g"),Const_exp(1)))))))) in
-  print_int(value_of_program(p))
+  print_int(final_to_num(value_of_program(p)))
 
 let () = example_run()

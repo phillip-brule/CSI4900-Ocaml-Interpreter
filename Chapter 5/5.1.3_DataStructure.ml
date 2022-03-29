@@ -17,6 +17,8 @@ type expression =
   | Proc_exp of var * expression
   | Diff_exp of expression * expression
   | Call_exp of expression * expression  (* operator operand *)
+  | Letrec_exp of var * var * expression * expression (*proc-name bound-variable proc-body letrec-body*)
+  | Begin_exp of expression list
                 
 type procedure = {
   var : var;
@@ -24,7 +26,7 @@ type procedure = {
   saved_env : env;
 }
 
-and env = Empty_env | Extend_env of var * exp_value * env
+and env = Empty_env | Extend_env of var * exp_value * env| Extend_env_rec of var * var * expression * env 
 
 and exp_value = ExpVal of int | ExpBool of bool | Proc of procedure
                                                         
@@ -42,11 +44,13 @@ type continuation =
   | Rator_cont of expression*env*continuation
   | Rand_cont of exp_value*continuation
 
-
 let empty_env () : env = Empty_env
 
 let extend_env (v:var) (value:exp_value) (e:env) : env = 
   Extend_env(v, value, e)
+    
+let extend_env_rec (proc_name:var) (bound_var:var) (proc_body:expression) (e:env) : env = 
+  Extend_env_rec(proc_name, bound_var, proc_body, e)
 
 let rec apply_env(e:env) (search_v:var) : exp_value = 
   match e with
@@ -75,7 +79,8 @@ let expval_to_proc (value:exp_value) : procedure =
   | Proc(p) -> p
   | _ -> raise Invalid
 let expval_to_finalanswer (value:exp_value): final_answer =
-  FinalVal(value)          
+  FinalVal(value)  
+          
 let final_to_num (f:final_answer) : int =
   match f with
   | FinalVal(x) -> expval_to_num x
@@ -107,6 +112,7 @@ and value_of_k (exp:expression) (environment:env ) (c:continuation) : final_answ
   | Const_exp(num) -> apply_cont c (num_val num)
   | Var_exp(var) -> apply_cont c (apply_env environment var)
   | Proc_exp(var, body) -> apply_cont c (proc_val (procedure var body environment))
+  | Letrec_exp(proc_name, bound_var, proc_body, letrec_body) -> value_of_k letrec_body (extend_env_rec proc_name bound_var proc_body environment) c  
   | Zero_exp(exp1)-> value_of_k exp1 environment (Zero1_cont c)
   | Let_exp(var, exp1, body)-> value_of_k exp1 environment (Let_exp_cont(var,body,environment,c))
   | If_exp(exp1, exp2, exp3)-> value_of_k exp1 environment (If_test_cont(exp2,exp3,environment,c))
