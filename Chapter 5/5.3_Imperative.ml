@@ -13,7 +13,6 @@ type expression =
   | Proc_exp of var * expression
   | Call_exp of expression * expression  (* operator operand *)
   | Letrec_exp of var * var * expression * expression (*proc-name bound-variable proc-body letrec-body*)
-  | Begin_exp of expression list
         
 
 type procedure = {
@@ -41,6 +40,7 @@ type continuation =
   | Rand_cont of exp_value*continuation
   
 
+    
 let empty_env () : env = Empty_env
 
   
@@ -50,12 +50,8 @@ let extend_env (v:var) (value:exp_value) (e:env) : env =
 let extend_env_rec (proc_name:var) (bound_var:var) (proc_body:expression) (e:env) : env = 
   Extend_env_rec(proc_name, bound_var, proc_body, e)
 
-let rec apply_env(e:env) (search_v:var) : exp_value = 
-  match e with
-  | Empty_env -> raise Invalid
-  | Extend_env(variable, value, envNext) -> if variable = search_v then value 
-      else apply_env envNext search_v
 
+  
 let num_val (i:int) : exp_value = 
   ExpVal(i)
 let bool_val (b:bool) : exp_value = 
@@ -82,12 +78,20 @@ let expval_to_finalanswer (value:exp_value): final_answer =
 let final_to_num (f:final_answer) : int =
   match f with
   | FinalVal(x) -> expval_to_num x
-  | _ ->  raise Invalid
-
+                     
 let procedure (v:var) (body:expression) (environment:env) : procedure = 
   {var = v;
    body = body;
    saved_env = environment;}
+  
+let rec apply_env(e:env) (search_v:var) : exp_value = 
+  match e with
+  | Empty_env -> raise Invalid
+  | Extend_env(variable, value, envNext) -> if variable = search_v then value 
+      else apply_env envNext search_v
+  | Extend_env_rec(proc_name, bound_var, proc_body, envNext) -> 
+      if proc_name = search_v then proc_val (procedure bound_var proc_body e)
+      else apply_env envNext search_v
   
 let cont = ref End_cont
 let exp = ref (Const_exp(0))
@@ -196,4 +200,5 @@ let example_run () =
                                                               Call_exp(Var_exp("g"),Const_exp(1)))))))) in
   print_int(final_to_num(value_of_program(p)))
 
-let () = example_run()
+let () = example_run() 
+
