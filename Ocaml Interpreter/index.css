@@ -1,8 +1,24 @@
+
+h1{
+    margin-top: 5%;
+    font-size: 50px;
+    font-family: 'Courier New', Courier, monospace;
+    text-align: center;
+}
+
 h2{
     margin-top: 10%;
     font-size: 50px;
     font-family: 'Courier New', Courier, monospace;
     text-align: center;
+}
+p{
+    margin-left: 10%;
+    margin-right: 10%;
+    font-size: 30px;
+    font-family: 'Courier New', Courier, monospace;
+    text-align: center;
+
 }
 
 div{
@@ -19,4 +35,10 @@ button{
     font-size: 20px;
     cursor: pointer;
 
+}
+about{
+    margin-top: 10%;
+    font-size: 50px;
+    font-family: 'Courier New', Courier, monospace;
+    text-align: center;
 }
