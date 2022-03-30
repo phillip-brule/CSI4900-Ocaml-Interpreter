@@ -3,7 +3,6 @@ exception Invalid
 
 type var = string 
 
-
 type expression = 
   | Zero_exp of expression
   | Const_exp of int
@@ -13,6 +12,9 @@ type expression =
   | Let_exp of var * expression * expression
   | Proc_exp of var * expression
   | Call_exp of expression * expression  (* operator operand *)
+  | Letrec_exp of var * var * expression * expression (*proc-name bound-variable proc-body letrec-body*)
+  | Begin_exp of expression list
+        
 
 type procedure = {
   var : var;
@@ -20,7 +22,7 @@ type procedure = {
   saved_env : env;
 }
 
-and env = Empty_env | Extend_env of var * exp_value * env
+and env = Empty_env | Extend_env of var * exp_value * env| Extend_env_rec of var * var * expression * env 
 
 and exp_value = ExpVal of int | ExpBool of bool | Proc of procedure
                                                         
@@ -37,34 +39,16 @@ type continuation =
   | Diff2_cont of exp_value*continuation
   | Rator_cont of expression*env*continuation
   | Rand_cont of exp_value*continuation
-                 
-(*type state = 
-  | Cont of continuation
-  | Envn of env
-  | Exp of expression
-  | Value of exp_value
-  | Proc1 of procedure*)
-      
-type state = 
-  | Cont 
-  | Envn 
-  | Exp 
-  | Value 
-  | Proc1 
+  
 
 let empty_env () : env = Empty_env
 
-
-
-(* type state = {
-  cont : continuation ref;
-  exp : expression ref;
-  envn : env ref;
-  value : exp_value ref;
-  proc1 : procedure ref};; *)
   
 let extend_env (v:var) (value:exp_value) (e:env) : env = 
   Extend_env(v, value, e)
+    
+let extend_env_rec (proc_name:var) (bound_var:var) (proc_body:expression) (e:env) : env = 
+  Extend_env_rec(proc_name, bound_var, proc_body, e)
 
 let rec apply_env(e:env) (search_v:var) : exp_value = 
   match e with
@@ -72,7 +56,6 @@ let rec apply_env(e:env) (search_v:var) : exp_value =
   | Extend_env(variable, value, envNext) -> if variable = search_v then value 
       else apply_env envNext search_v
 
-    
 let num_val (i:int) : exp_value = 
   ExpVal(i)
 let bool_val (b:bool) : exp_value = 
@@ -105,101 +88,104 @@ let procedure (v:var) (body:expression) (environment:env) : procedure =
   {var = v;
    body = body;
    saved_env = environment;}
+  
+let cont = ref End_cont
+let exp = ref (Const_exp(0))
+let envn = ref Empty_env
+let value = ref (num_val(0))
+let proc1 = ref (procedure "" (Const_exp(0)) Empty_env)
 
-(* let state (c:continuation) (ex:expression) (environment:env) (v:exp_value) (p:procedure): state =
-  {cont = ref c ;
-   exp = ref ex;
-   envn = ref environment;
-   value = ref v;
-   proc1= ref p;} 
-*)
-let cont = ref Cont
-let exp = ref Exp
-let envn = ref Envn
-let value = ref Value
-let proc1 = ref Proc1
-
-let rec apply_cont () : final_answer =
-  match !state.cont with 
-  | End_cont -> (Printf.printf "End of computation." ) ; FinalVal value
+let rec apply_cont() : final_answer =
+  match !cont with 
+  | End_cont -> (Printf.printf "End of computation." ) ; FinalVal !value
   | Zero1_cont(saved_cont) -> 
-      (state.cont) := saved_cont;
-      (state.value) := bool_val(if expval_to_num !(state.value) = 0 then true else false);
-      apply_cont
+      cont := saved_cont;
+      value := bool_val(if expval_to_num !value = 0 then true else false);
+      apply_cont()
   | Let_exp_cont(var, body, saved_env, saved_cont) -> 
-      (state.cont) := saved_cont;
-      (state.exp) := body;
-      (state.envn) := extend_env var !(state.value) saved_env;
-      value_of_k
+      cont := saved_cont;
+      exp := body;
+      envn := extend_env var !value saved_env;
+      value_of_k()
   | If_test_cont(exp2, exp3, saved_env, saved_cont) -> 
-      (state.cont) := saved_cont; 
-      if expval_to_bool !(state.value) then 
-        (state.exp) := exp2 else (state.exp):= exp3 ;
-      (state.envn) := saved_env; 
-      value_of_k
+      cont := saved_cont; 
+      if expval_to_bool !value then 
+        exp := exp2 else exp:= exp3 ;
+      envn := saved_env; 
+      value_of_k()
   | Diff1_cont(exp2, saved_env, saved_cont) -> 
-      (state.cont) := Diff2_cont (!(saved.value) saved_cont);
-      (state.exp) := exp2;
-      (state.envn) := saved_env; 
-      value_of_k 
+      cont := Diff2_cont(!value, saved_cont);
+      exp := exp2;
+      envn := saved_env; 
+      value_of_k() 
   | Diff2_cont(val1, saved_cont) -> 
       let num1 = expval_to_num val1 in
-      let num2 = expval_to_num !(state.value) in 
-      (state.cont) := saved_cont;
-      (state.value) := num_val(num1-num2);
-      apply_cont
+      let num2 = expval_to_num !value in 
+      cont := saved_cont;
+      value := num_val(num1-num2);
+      apply_cont()
   | Rator_cont(rand, saved_env, saved_cont) -> 
-      (state.cont):= Rand_cont (!(state.value) saved_cont);
-      (state.exp) := rand;
-      (state.envn) := saved_env; 
-      value_of_k
+      cont:= Rand_cont (!value, saved_cont);
+      exp := rand;
+      envn := saved_env; 
+      value_of_k() 
   | Rand_cont(rator_val, saved_cont) -> let rator_proc = expval_to_proc rator_val in
-      (state.cont) := saved_cont;
-      (state.proc1) := rator_proc;
-      (state.value) := !(state.value);
-      apply_procedure_k 
+      cont := saved_cont;
+      proc1 := rator_proc;
+      value := !value;
+      apply_procedure_k() 
 
-  
-
+and value_of_k () : final_answer = 
+  match !exp with
+  | Const_exp(num) -> 
+      value := num_val num ; 
+      apply_cont()
+  | Var_exp(var) -> 
+      value := apply_env !envn var; 
+      apply_cont()
+  | Proc_exp(var, body) -> 
+      value := proc_val(procedure var body !envn);
+      apply_cont()
+  | Letrec_exp(proc_name, bound_var, proc_body, letrec_body) ->
+      exp := letrec_body;
+      envn := extend_env_rec proc_name bound_var proc_body !envn; 
+      value_of_k()
+  | Zero_exp(exp1) -> 
+      cont := Zero1_cont !cont ; 
+      exp := exp1 ; 
+      value_of_k()
+  | Let_exp(var, exp1, body) -> 
+      cont := Let_exp_cont (var, body, !envn, !cont) ; 
+      exp := exp1;
+      value_of_k()
+  | If_exp(exp1, exp2, exp3) -> 
+      cont := If_test_cont(exp2, exp3, !envn, !cont); 
+      exp := exp1 ; 
+      value_of_k()
+  | Diff_exp(exp1, exp2) ->
+      cont := Diff1_cont (exp2, !envn, !cont) ;
+      exp := exp1 ; 
+      value_of_k()
+  | Call_exp(rator, rand) ->
+      cont := Rator_cont (rand, !envn, !cont) ;
+      exp := rator; 
+      value_of_k()
+      
+and apply_procedure_k () : final_answer = 
+  exp := !proc1.body;
+  envn := extend_env !proc1.var !value !proc1.saved_env;
+  value_of_k()
+      
 let value_of_program (p:program) : final_answer = 
   match p with
   | Expression(exp1) -> let init_env = empty_env() in
       let end_c = End_cont in 
-      (state.cont) := end_c; 
-      (state.exp) :=  exp1;
-      (state.envn):= init_env;
-      value_of_k
+      cont := end_c; 
+      exp :=  exp1;
+      envn:= init_env;
+      value_of_k()
   
-    
-let apply_procedure_k () : final_answer =
-  match !(state.proc1) with
-  | procedure(var, body, saved_env) -> 
-      (state.exp) := body;
-      (state.envn) := extend_env var !(state.value) saved_env;
-      value_of_k
-
-
-let rec value_of_k () : final_answer = 
-  match !(state.exp) with
-  | Const_exp(num) -> (state.value) := num_val num ; apply_cont
-  | Var_exp(var) -> (state.value) := apply_env !(state.env) var; apply_cont
-  | Proc_exp(var, body) -> (state.value) := proc_val (procedure var body !(state.env))
-  | Zero_exp(exp) -> (state.cont) := Zero1_cont cont ; (state.exp) := exp ; value_of_k
-  | Let_exp(var, exp, body) -> 
-      (state.cont) := Let_exp_cont var body !(state.env) !(state.cont) ; 
-      (state.exp) := exp
-  | If_exp(exp1, exp2, exp3) -> 
-      (state.cont) := Let_test_cont exp2 exp3 !(state.env) !(state.cont); 
-      (state.exp) := exp1 ; value_of_k
-  | Diff_exp(exp1, exp2) ->
-      (state.cont) := Diff1_cont exp2 !(state.env) !(state.cont) ;
-      (state.exp) := exp1 ; value_of_k
-  | Call_exp(rator, rand) ->
-      (state.cont) := Rator_cont rand !(state.env) !(state.cont) ;
-      (state.exp) := rator; value_of_k
-      
   
-
 let example_run () = 
   let p = Expression(Let_exp("x", Const_exp(200), 
                              Let_exp("f", 
@@ -208,6 +194,6 @@ let example_run () =
                                              Let_exp("g", Proc_exp("z", Diff_exp(Var_exp("z"), Var_exp("x"))),
                                                      Diff_exp(Call_exp(Var_exp("f"),Const_exp(1)),
                                                               Call_exp(Var_exp("g"),Const_exp(1)))))))) in
-  print_int(value_of_program(p))
+  print_int(final_to_num(value_of_program(p)))
 
 let () = example_run()
