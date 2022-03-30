@@ -192,8 +192,7 @@ let value_of_program (p:program) : final_answer =
   
 let example_run () = 
   let p = Expression(Let_exp("x", Const_exp(200), 
-                             Let_exp("f", 
-                                     Proc_exp("z", Diff_exp(Var_exp("z"), Var_exp("x"))),
+                             Let_exp("f", Proc_exp("z", Diff_exp(Var_exp("z"), Var_exp("x"))),
                                      Let_exp("x", Const_exp(100), 
                                              Let_exp("g", Proc_exp("z", Diff_exp(Var_exp("z"), Var_exp("x"))),
                                                      Diff_exp(Call_exp(Var_exp("f"),Const_exp(1)),
