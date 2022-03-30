@@ -1,0 +1,12 @@
+let x=0
+in letrec
+    even() = if zero?(x)
+            then 1
+            else let d = set x = sub1(x)
+                in (odd) 
+    odd() = if zero?(x)
+            then 0 
+            else let d = set x = sub1(x)
+                in (even)
+    in let d = set x = 13
+        in (odd)
