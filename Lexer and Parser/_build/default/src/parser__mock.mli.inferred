@@ -1,0 +1,27 @@
+type token =
+    ZERO
+  | THEN
+  | SEMICOLON
+  | RPAREN
+  | PROC
+  | LPAREN
+  | LETREC
+  | LET
+  | INT of int
+  | IN
+  | IF
+  | ID of string
+  | EQUALS
+  | EOF
+  | END
+  | ELSE
+  | DIFF
+  | BEGIN
+val menhir_begin_marker : int
+val xv_separated_nonempty_list_SEMICOLON_expression_ : LETREC.expression list
+val xv_separated_list_SEMICOLON_expression_ : LETREC.expression list
+val xv_prog : LETREC.expression
+val xv_loption_separated_nonempty_list_SEMICOLON_expression__ :
+  LETREC.expression list
+val xv_expression : LETREC.expression
+val menhir_end_marker : int
