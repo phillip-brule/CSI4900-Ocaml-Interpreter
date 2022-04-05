@@ -59,17 +59,25 @@ let rec apply_env(e:tenv) (search_v:var) : expType =
       else apply_env envNext search_v 
           
           
+let expType_to_list(exp: expType) : expType list =
+  match exp with
+  |Int_type -> [Int_type]
+  |Bool_type -> [Bool_type]
+  |Proc_type(arg, res) -> arg :: res :: [] 
+
+                
 let rec type_to_external_form (ty: expType): expType list =
   match ty with
   |Int_type -> [Int_type]
   |Bool_type -> [Bool_type]
-  |Proc_type(arg, res) -> type_to_external_form arg; type_to_external_form res
+  |Proc_type(arg, res) -> type_to_external_form arg ; type_to_external_form res
   
-let expType_to_str (v: expType): string = 
+let rec expType_to_str (v: expType): string = 
   match v with
   |Int_type -> "int"
   |Bool_type -> "bool"
-  |_ -> raise Invalid
+  |Proc_type(res,arg) -> expType_to_str res^" -> "^ expType_to_str arg 
+          
 let report_unequal_types (ty1: expType) (ty2: expType) (exp: expression) = 
   (type_to_external_form ty1);(type_to_external_form ty2)
   
@@ -108,7 +116,7 @@ let rec type_of(exp: expression) (tenv: tenv): expType =
 
 let value_of_program (p:program) : string = 
   match p with
-  | Expression(exp) -> let init_env = empty_tenv() in
+  | Expression(exp) -> let init_env = empty_tenv() in 
       expType_to_str (type_of exp init_env)
 
 
@@ -122,16 +130,23 @@ let example_run () =
   print_string(value_of_program p)
     
 let example_run2() = 
+  let p = Expression(Proc_exp("z", Int_type, Proc_exp("x", Int_type, Zero_exp(Diff_exp(Const_exp(200), Const_exp(100)))))) in
+  
+  print_string(value_of_program p)
+    
+let example_run3() = 
   let p = Expression(
       Let_exp("x", Const_exp(200), 
               Let_exp("f", Proc_exp("z", Int_type, Diff_exp(Var_exp("z"), Var_exp("x"))), 
                       Let_exp("x", Const_exp(100), 
                               Let_exp("g", Proc_exp("z", Int_type, Diff_exp(Var_exp("z"), Var_exp("x"))),
                                       Let_exp("a", Diff_exp(Call_exp(Var_exp("f"),Const_exp(1)), Call_exp(Var_exp("g"),Const_exp(1))),
-                                              Zero_exp(Call_exp(Var_exp("a"),Const_exp(0)))))))))  in
+                                              Zero_exp(Var_exp("a"))))))))  in
   print_string(value_of_program p)
+    
 let () = example_run()
 let () = example_run2()
+let () = example_run3()
 
 
                                               
