@@ -17,9 +17,9 @@ type expression =
   | Assign_exp of var * expression
   | Letrec_exp of var * var * expression * expression (*proc-name bound-variable proc-body letrec-body*)
   | Begin_exp of expression list
-  | New_object_exp of var * expression list
+  | New_object_exp of className * expression list
   | Method_call_exp of expression * var * expression list (*send expression*)
-  | Super_call_exp of className * expression list
+  | Super_call_exp of methodName * expression list
   | Self_exp
 
 
@@ -95,12 +95,17 @@ let the_class_env : classEnv ref = ref []
 
 let empty_env () : env = Empty_env
 
+let self : object_inst ref = ref { class_name = ClassName("object"); fields = [];}
+let super : className ref = ref (ClassName("#f"))
+
 let extend_env (v:var) (refNum:reference) (e:env) : env = 
   Extend_env(v, refNum, e)
 let extend_env_rec (proc_name:var) (bound_var:var) (proc_body:expression) (e:env) : env = 
 	Extend_env_rec(proc_name, bound_var, proc_body, e)
 let extend_env_list (vars:var list) (values:reference list) (e:env) : env = 
 	Extend_env_list(vars, values, e)
+let extend_env_with_self_and_super (new_self:object_inst) (new_super:className) (e:env) : env = 
+	self := new_self; super := new_super; e
 
 let empty_store () : store = 
 	let (listOfReferences: exp_value array) = [||] in
@@ -158,6 +163,7 @@ let global_store = empty_store()
 let method_decls_to_method_env (m_decls:method_decl list) (s_name:className) (f_names:var list) : methodEnv = 
 	List.map (fun (m_decl:method_decl) -> (m_decl.method_name, (new_method m_decl.variables m_decl.body s_name f_names)))
 	m_decls
+
 let find_method (c_name:className) (search_v:methodName) : methodType = 
 	let the_class = lookup_class c_name in
 		let m_env = the_class.method_env in
@@ -201,6 +207,11 @@ let expval_to_bool (value:exp_value) : bool =
 let expval_to_proc (value:exp_value) : procedure = 
   match value with
   | Proc(p) -> p
+  | _ -> raise Invalid
+
+ let expval_to_obj (value:exp_value) :object_inst = 
+  match value with
+  | Obj(o) -> o 
   | _ -> raise Invalid
 
 
@@ -283,22 +294,27 @@ let rec value_of (exp:expression) (environment:env) : exp_value =
 		| head :: tail -> let _throw = value_of head environment in (); 
 			value_of (Begin_exp(tail)) environment
 	end
-	| Self_exp -> apply_env environment self (*self refers to the current bound object*)
+	| Self_exp -> Obj(!self) (*self refers to the current bound object*)
 	| Method_call_exp(object_exp, method_name, operands) -> let args = values_of_exps operands environment in
-		let obj = value_of object_exp environment in
-			apply_method (find_method (object_to_class_name obj) method_name) obj args
+		let obj = expval_to_obj (value_of object_exp environment) in
+			apply_method (find_method (obj.class_name) (MethodName(method_name))) obj args
 	| Super_call_exp(method_name, operands) -> let args = values_of_exps operands environment in
-		let obj = apply_env environment self in
-			apply_method (find_method (apply_env environment super) method_name) obj args
+		let obj = !self in
+			apply_method (find_method (!super) method_name) obj args
 	| New_object_exp(class_name, operands) -> let args = values_of_exps operands environment in
 		let obj = new_object class_name in 
-			let _throw = apply_method (find_method class_name (initialize_object ())) obj args in obj
+		(* all classes need an initialize method called by keywork init which is called everytime a new object is created*)
+			let _throw = apply_method (find_method class_name (MethodName("init"))) obj args in Obj(obj) 
 
 
 and apply_method (m:methodType) (self:object_inst) (args:exp_value list) : exp_value = 
 	value_of m.body (extend_env_list m.vars (List.map newref args) 
-		extend_env_with_self_and_super self m.super_name (extend_env m.field_names self.fields (empty_env ())))
+		(extend_env_with_self_and_super self m.super_name (extend_env_list m.field_names self.fields (empty_env ()))))
 
+and values_of_exps (rands:expression list) (environment:env) : exp_value list = 
+	match rands with
+	| [] -> []
+	| head :: tail -> (value_of head environment) :: (values_of_exps tail environment)
 
 
 let value_of_program (p:program) : exp_value = 
