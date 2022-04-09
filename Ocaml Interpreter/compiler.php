@@ -8,7 +8,7 @@
         <h1>Ocaml Interpreter</h1>
         <hr>
         <div>
-            <form method="post" action="/run.php">
+            <form method="post" >
                 <button type="submit" class="butn" name=
                 "submit">Run</button>
             </form>

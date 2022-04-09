@@ -14,7 +14,7 @@
         pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est
         laborum.
     </p>
-    <a href="index.html"><button class="btnn">Previous</button></a>
+    <a href="index.php"><button class="btnn">Previous</button></a>
 
 
 </body>
