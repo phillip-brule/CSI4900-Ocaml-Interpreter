@@ -1,12 +1,10 @@
-
+ 
 h1{
     font-family: 'Courier New', Courier, monospace;
     text-align: center;
 }
+
 button{
-    margin-left:40%;
-    margin-top: 1%;
-    margin-bottom: 1%;
     height: 50px;
     width: 100px;
     background-color:#3aa832;
@@ -15,12 +13,14 @@ button{
     font-size: 18px;
     cursor: pointer;
 }
-textarea{
+
+input{
     width:40%;
+    margin-top: 3%;
     height:500px;
     border: 2px black solid;
     border-radius: 5px;
     margin-left: 5%;
     padding: 20px;
     font-size: 20px;
-}
+} 

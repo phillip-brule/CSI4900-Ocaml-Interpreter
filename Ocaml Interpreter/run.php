@@ -1,9 +1,10 @@
 <?php
-if(isset($_POST['submit'])){
-    $data=$_POST['submit'];
-    $fp= fopen("test.txt","a");
-    fwrite($fp,$data);
-    fclose($fp);
+              
+if(isset($_POST['textdata']))
+{
+$data=$_POST['textdata'];
+$fp = fopen('data.txt', 'a');
+fwrite($fp, $data);
+fclose($fp);
 }
-
 ?>
