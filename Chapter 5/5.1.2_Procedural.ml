@@ -70,7 +70,6 @@ let procedure (v:var) (body:expression) (environment:env) : procedure =
    body = body;
    saved_env = environment;}
 
-  
         
 let rec apply_cont (c: cont) (exp: exp_value) : final_answer =
   c exp
