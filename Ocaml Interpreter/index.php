@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <link rel="stylesheet" href="/index.css">
+        <link rel="stylesheet" href="index.css">
         <title>Interpreter</title>
     </head>
     <body>
         <h2>Ocaml Interpreter for: <br><span class="auto-input"></h2>
         <div>   
-            <a href="/about.html"><button>About</button></a>
+            <a href="about.html"><button>About</button></a>
             <a href="compiler.html"><button>Compiler</button></a>
         </div>
     

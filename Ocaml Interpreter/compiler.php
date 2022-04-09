@@ -1,15 +1,16 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <link rel="stylesheet" href="/compiler.css">
+        <link rel="stylesheet" href="compiler.css">
         <title>Compiler</title>
     </head>
     <body>
         <h1>Ocaml Interpreter</h1>
         <hr>
         <div>
-            <form action="/action_page.php" id="usrform">
-                <button type="submit" class="butn">Run</button>
+            <form method="post" action="run.php">
+                <button type="submit" class="butn" name=
+                "submit">Run</button>
             </form>
             <textarea placeholder="Input your code here ..." name="comment" form="usrform"></textarea>
             <output></output>
