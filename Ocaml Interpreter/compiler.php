@@ -38,8 +38,8 @@
   <h1>Ocaml Interpreter</h1>
   <hr>
   <form method="post">
-    <button type="submit" name="submit">RUN</button>
-    <input placeholder= "Enter Your Text Here" type="text" name="textdata">
+  <button type="submit" name="submit">RUN</button><br>
+  <textarea placeholder= "Enter Your Text Here" type="text" name="textdata"></textarea>
   </form>
 </body>
 </html>

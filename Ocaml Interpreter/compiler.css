@@ -5,6 +5,7 @@ h1{
 }
 
 button{
+    margin-left:40%;
     height: 50px;
     width: 100px;
     background-color:#3aa832;
@@ -14,9 +15,9 @@ button{
     cursor: pointer;
 }
 
-input{
+textarea{
+    margin-top: 1%;
     width:40%;
-    margin-top: 3%;
     height:500px;
     border: 2px black solid;
     border-radius: 5px;
