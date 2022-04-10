@@ -1,49 +1,35 @@
-<!-- <!DOCTYPE html>
-<html>
-    <head>
-        <link rel="stylesheet" href="compiler.css">
-        <title>Compiler</title>
-    </head>
-    <body>
-        <h1>Ocaml Interpreter</h1>
-        <hr>
-        <div>
-            <form>     
-                <button type="submit" class="butn" value="submit">Run</button>      
-                <input placeholder="Input your code here ..." name="text" >
-            </form> 
-            // if(isset($_POST['submit'])=="submit"){
-            //     $data=$_POST['text'];
-            //     $fp= fopen("test.txt","a");
-            //     fwrite($fp,$data);
-            //     fclose($fp);
-            // }
-
-             
-            
-        </div>
-        
-    </body>
-</html> -->
-
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Store form data in .txt file</title>
-  <link rel="stylesheet" href="compiler.css">
-
+    <title>Store form data in .txt file</title>
+    <link rel="stylesheet" href="compiler.css">
+   
 </head>
 
 <body>
-    <h1>Compiler</h1>
-    <hr>
+    <?php include "nav.php"?>
+    <div class="header">
+        <a href="index.php">&lt; Home</a>
+        <h1>Compiler</h1>
+    </div>   
     <form method="post">
         <button type="submit" name="submit">RUN</button><br>
         <textarea placeholder= "Enter Your Text Here" type="text" name="textdata"></textarea>
         <div class="divs"></div>
     </form>
+    <br>
+    <br>
+    <footer>
+        <div class="student">
+            <h4>Aditya Nair</h4>
+            <h4>Phillip Brule</h4>
+            <h4>Ribhav Khosla</h4>
+        </div>
+        <div class="prof">
+            <h4>Supervisor: Dr. Amy Felty</h4>
+        </div>
+    </footer>
 
-    <a href="index.php"><button name="back">Previous</button></a>
 </body>
 </html>
 
