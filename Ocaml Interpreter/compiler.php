@@ -35,12 +35,15 @@
 </head>
 
 <body>
-  <h1>Compiler</h1>
-  <hr>
-  <form method="post">
-  <button type="submit" name="submit">RUN</button><br>
-  <textarea placeholder= "Enter Your Text Here" type="text" name="textdata"></textarea>
-  </form>
+    <h1>Compiler</h1>
+    <hr>
+    <form method="post">
+        <button type="submit" name="submit">RUN</button><br>
+        <textarea placeholder= "Enter Your Text Here" type="text" name="textdata"></textarea>
+        <div class="divs"></div>
+    </form>
+
+    <a href="index.php"><button name="back">Previous</button></a>
 </body>
 </html>
 
