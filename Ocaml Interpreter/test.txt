@@ -1,1 +1,1 @@
-d;gadlgaga/;j
+Proc(x) -(x, 3)

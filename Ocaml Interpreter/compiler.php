@@ -35,7 +35,7 @@
 </head>
 
 <body>
-  <h1>Ocaml Interpreter</h1>
+  <h1>Compiler</h1>
   <hr>
   <form method="post">
   <button type="submit" name="submit">RUN</button><br>
