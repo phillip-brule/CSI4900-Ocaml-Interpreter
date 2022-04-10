@@ -7,14 +7,28 @@
 </head>
 
 <body>
-    <h1>About Ocaml Interpreter</h1>
-    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore
-        magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-        consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-        pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est
-        laborum.
+    <?php include("nav.php")?>
+    <div class="header">
+    <a href="index.php">&lt; Home</a>
+        <h1>About Ocaml Interpreter</h1>
+    </div>  
+    <p>There is often some confusion between what an interpreter is and a compiler. 
+    A compiler generally takes your code and then converts & optimizes this code into 
+    lower-level machine code (nowadays often byte code) that your machine will then be 
+    able to understand and run, usually in the form of an executable. An interpreter 
+    on the other hand takes your code and executes it right away. An advantage of this, 
+    is that as long as you have the interpreter the code can run on any system. 
     </p>
-    <a href="index.php"><button class="btnn">Previous</button></a>
+    <footer>
+        <div class="student">
+            <h4>Aditya Nair</h4>
+            <h4>Phillip Brule</h4>
+            <h4>Ribhav Khosla</h4>
+        </div>
+        <div class="prof">
+            <h4>Supervisor: Dr. Amy Felty</h4>
+        </div>
+    </footer>
 
 
 </body>

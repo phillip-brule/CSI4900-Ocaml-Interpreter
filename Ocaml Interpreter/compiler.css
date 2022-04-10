@@ -1,5 +1,32 @@
- 
+
+*{
+    margin: 0;
+    padding: 0;
+}
+
+.header{
+    /* border: 5px green solid; */
+    top:0;
+    padding: 15px;
+    background-color: black;
+}
+.header a{
+    float: left;
+    text-decoration: none;
+    background-color: black;
+    color: white;
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: bold;
+    margin-left: 30px;
+    margin-top: 5px;
+    text-align: center;
+    font-size: 30px;
+    cursor: pointer;
+
+}
 h1{
+    font-size: 40px;
+    color: white;
     font-family: 'Courier New', Courier, monospace;
     text-align: center;
 }
@@ -19,6 +46,7 @@ button[name="submit"]{
     margin-left:41.2%;
     height: 50px;
     width: 100px;
+    margin-top: 1%;
     background-color:#3aa832;
     color: white;
     border-radius: 5px;
@@ -49,3 +77,22 @@ textarea{
     padding: 20px;
     font-size: 25px;
 } 
+
+footer{
+    width: 100%;
+    bottom: 0;
+    background-color: black;
+    color: white;
+    
+}
+.student , .prof{
+    font-family: 'Courier New', Courier, monospace;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+h4{
+    font-size: 20px;
+    margin: 5px 20px;
+}
