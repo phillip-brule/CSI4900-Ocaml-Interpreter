@@ -1,0 +1,41 @@
+type token =
+    ZERO
+  | THEN
+  | SET
+  | SEMICOLON
+  | RPAREN
+  | PROC
+  | LPAREN
+  | LETRECINTERP
+  | LETREC
+  | LET
+  | INT of int
+  | IN
+  | IMPLICIT
+  | IMPERATIVE
+  | IF
+  | ID of string
+  | EQUALS
+  | EOF
+  | END
+  | ELSE
+  | DIFF
+  | BEGIN
+val menhir_begin_marker : int
+val xv_separated_nonempty_list_SEMICOLON_letrec_expression_ :
+  LETREC.expression list
+val xv_separated_nonempty_list_SEMICOLON_implicit_expression_ :
+  Implicit_refs.expression list
+val xv_separated_list_SEMICOLON_letrec_expression_ : LETREC.expression list
+val xv_separated_list_SEMICOLON_implicit_expression_ :
+  Implicit_refs.expression list
+val xv_programChain : ProgramTypes.programChain
+val xv_prog : ProgramTypes.programChain
+val xv_loption_separated_nonempty_list_SEMICOLON_letrec_expression__ :
+  LETREC.expression list
+val xv_loption_separated_nonempty_list_SEMICOLON_implicit_expression__ :
+  Implicit_refs.expression list
+val xv_letrec_expression : LETREC.expression
+val xv_implicit_expression : Implicit_refs.expression
+val xv_imperative_expression : Imperative.expression
+val menhir_end_marker : int

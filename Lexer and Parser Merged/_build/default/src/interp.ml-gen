@@ -1,0 +1,34 @@
+(** @canonical Interp.Explicit_refs *)
+module Explicit_refs = Interp__Explicit_refs
+
+
+(** @canonical Interp.Imperative *)
+module Imperative = Interp__Imperative
+
+
+(** @canonical Interp.Implicit_refs *)
+module Implicit_refs = Interp__Implicit_refs
+
+
+(** @canonical Interp.LETREC *)
+module LETREC = Interp__LETREC
+
+
+(** @canonical Interp.Lexer *)
+module Lexer = Interp__Lexer
+
+
+(** @canonical Interp.Main *)
+module Main = Interp__Main
+
+
+(** @canonical Interp.PROC_Implementation *)
+module PROC_Implementation = Interp__PROC_Implementation
+
+
+(** @canonical Interp.Parser *)
+module Parser = Interp__Parser
+
+
+(** @canonical Interp.ProgramTypes *)
+module ProgramTypes = Interp__ProgramTypes
