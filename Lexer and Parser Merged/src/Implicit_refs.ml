@@ -141,7 +141,7 @@ let rec value_of (exp:expression) (environment:env) : exp_value =
 		let apply_procedure (p:procedure) (value:exp_value) : exp_value = 
   			value_of p.body (extend_env p.var (newref value) p.saved_env) in
 					apply_procedure proc arg
-	| Assign_exp(var, exp1) -> if setref (apply_env environment var) (value_of exp1 environment) then print_string "Varriable Assignment Success  " else raise (Failure "variable assignment failure");
+	| Assign_exp(var, exp1) -> if setref (apply_env environment var) (value_of exp1 environment) then () else raise (Failure "variable assignment failure");
 		num_val 27
 	| Letrec_exp(proc_name, bound_var, proc_body, letrec_body) -> let newEnv = extend_env_rec proc_name bound_var proc_body environment in
 		value_of letrec_body newEnv
@@ -175,5 +175,3 @@ let example_run () =
 		Let_exp("result", Assign_exp("x", Diff_exp(Var_exp("x"), Const_exp(-1))), Diff_exp(Var_exp("x"), Var_exp("y")) ))),
 		Call_exp(Call_exp(Var_exp("f"),Const_exp(44)), Const_exp(33)))
 	in print_int (value_of_program (Expression(p))) 
-
-let () = example_run()

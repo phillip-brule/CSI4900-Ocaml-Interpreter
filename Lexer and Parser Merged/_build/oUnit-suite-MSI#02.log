@@ -1,0 +1,20 @@
+2022-04-11T04:41:05+00:00 MSI#02 I: Start test suite:1:subtract.
+2022-04-11T04:41:05+00:00 MSI#02 E: Test suite:1:subtract exited with an error.
+2022-04-11T04:41:05+00:00 MSI#02 E: Interp.Parser.MenhirBasics.Error in test suite:1:subtract.
+2022-04-11T04:41:05+00:00 MSI#02 E: Raised at file "src/parser.ml" (inlined), line 8, characters 6-17
+2022-04-11T04:41:05+00:00 MSI#02 E: Called from file "src/parser.ml", line 3339, characters 10-17
+2022-04-11T04:41:05+00:00 MSI#02 E: Called from file "src/main.ml", line 27, characters 1-11
+2022-04-11T04:41:05+00:00 MSI#02 E: Called from file "test/main.ml", line 8, characters 47-57
+2022-04-11T04:41:05+00:00 MSI#02 E: Called from file "src/lib/ounit2/advanced/oUnitRunner.ml", line 83, characters 13-26
+2022-04-11T04:41:05+00:00 MSI#02 E: 
+2022-04-11T04:41:05+00:00 MSI#02 I: End test suite:1:subtract.
+2022-04-11T04:41:05+00:00 MSI#02 I: Start test suite:5:letrec example from pg 82 & figure 3.10.
+2022-04-11T04:41:05+00:00 MSI#02 E: Test suite:5:letrec example from pg 82 & figure 3.10 exited with an error.
+2022-04-11T04:41:05+00:00 MSI#02 E: Interp.Parser.MenhirBasics.Error in test suite:5:letrec example from pg 82 & figure 3.10.
+2022-04-11T04:41:05+00:00 MSI#02 E: Raised at file "src/parser.ml" (inlined), line 8, characters 6-17
+2022-04-11T04:41:05+00:00 MSI#02 E: Called from file "src/parser.ml", line 3339, characters 10-17
+2022-04-11T04:41:05+00:00 MSI#02 E: Called from file "src/main.ml", line 27, characters 1-11
+2022-04-11T04:41:05+00:00 MSI#02 E: Called from file "test/main.ml", line 8, characters 47-57
+2022-04-11T04:41:05+00:00 MSI#02 E: Called from file "src/lib/ounit2/advanced/oUnitRunner.ml", line 83, characters 13-26
+2022-04-11T04:41:05+00:00 MSI#02 E: 
+2022-04-11T04:41:05+00:00 MSI#02 I: End test suite:5:letrec example from pg 82 & figure 3.10.

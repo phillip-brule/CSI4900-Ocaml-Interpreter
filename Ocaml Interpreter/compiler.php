@@ -41,5 +41,7 @@ $data=$_POST['textdata'];
 $fp = fopen('test.txt', 'w');
 fwrite($fp, $data);
 fclose($fp);
+exec('make web_run', $output, $return_status);
+echo $output;
 }
 ?>

@@ -200,5 +200,4 @@ let example_run () =
                                                               Call_exp(Var_exp("g"),Const_exp(1)))))))) in
   print_int(final_to_num(value_of_program(p)))
 
-let () = example_run() 
 

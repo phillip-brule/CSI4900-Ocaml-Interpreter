@@ -1,0 +1,9 @@
+Implicit:
+let f = proc x proc y
+	begin 
+		set x = (x - (-1));
+		(x - y)
+	end 
+in ((f 44) 33)
+Imperative:
+let x = 200 in let f = proc z (z - x) in let x = 100 in let g = proc z (z - x) in (f 1) - (g 1)

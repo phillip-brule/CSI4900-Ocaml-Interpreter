@@ -1,9 +1,10 @@
-# C:\OCaml64\home\Phillip\.opam\4.13.1+mingw64c\bin\dune.exe exec console/main.exe
+# dune exec web_run/main.exe
 # OCAMLPARAM: unset
-# Workspace root: "C:\\OCaml64\\home\\Phillip\\Lexer and Parser Merged"
+# Workspace root: "/home/phillip/Lexer and Parser Merged"
+$ /usr/bin/nproc > /tmp/dune205b99.output 2> /dev/null
 # Auto-detected concurrency: 8
 # disable binary cache
-$ C:\OCaml64\home\Phillip\.opam\4.13.1+mingw64c\bin\ocamlc.opt.exe -config > C:\OCaml64\tmp\duned7f583.output
+$ /usr/bin/ocamlc.opt -config > /tmp/dune8a6d4a.output
 # Dune context:
 #  { name = "default"
 #  ; kind = "default"
@@ -12,125 +13,102 @@ $ C:\OCaml64\home\Phillip\.opam\4.13.1+mingw64c\bin\ocamlc.opt.exe -config > C:\
 #  ; for_host = None
 #  ; fdo_target_exe = None
 #  ; build_dir = "default"
-#  ; toplevel_path =
-#      Some
-#        External "C:/OCaml64/home/Phillip/.opam/4.13.1+mingw64c/lib/toplevel"
-#  ; ocaml_bin =
-#      External "C:\\OCaml64\\home\\Phillip\\.opam\\4.13.1+mingw64c\\bin"
-#  ; ocaml =
-#      Ok
-#        External
-#          "C:\\OCaml64\\home\\Phillip\\.opam\\4.13.1+mingw64c\\bin\\ocaml.exe"
-#  ; ocamlc =
-#      External
-#        "C:\\OCaml64\\home\\Phillip\\.opam\\4.13.1+mingw64c\\bin\\ocamlc.opt.exe"
-#  ; ocamlopt =
-#      Ok
-#        External
-#          "C:\\OCaml64\\home\\Phillip\\.opam\\4.13.1+mingw64c\\bin\\ocamlopt.opt.exe"
-#  ; ocamldep =
-#      Ok
-#        External
-#          "C:\\OCaml64\\home\\Phillip\\.opam\\4.13.1+mingw64c\\bin\\ocamldep.opt.exe"
-#  ; ocamlmklib =
-#      Ok
-#        External
-#          "C:\\OCaml64\\home\\Phillip\\.opam\\4.13.1+mingw64c\\bin\\ocamlmklib.opt.exe"
+#  ; toplevel_path = Some External "/home/phillip/.opam/default/lib/toplevel"
+#  ; ocaml_bin = External "/usr/bin"
+#  ; ocaml = Ok External "/home/phillip/.opam/default/bin/ocaml"
+#  ; ocamlc = External "/usr/bin/ocamlc.opt"
+#  ; ocamlopt = Ok External "/usr/bin/ocamlopt.opt"
+#  ; ocamldep = Ok External "/usr/bin/ocamldep.opt"
+#  ; ocamlmklib = Ok External "/usr/bin/ocamlmklib.opt"
 #  ; env =
 #      map
-#        { "DUNE_OCAML_HARDCODED" :
-#            "C:\\\\OCaml64\\\\home\\\\Phillip\\\\.opam\\\\4.13.1+mingw64c\\lib"
-#        ; "DUNE_OCAML_STDLIB" :
-#            "C:/OCaml64/home/Phillip/.opam/4.13.1+mingw64c/lib/ocaml"
-#        ; "DUNE_SOURCEROOT" :
-#            "C:\\OCaml64\\home\\Phillip\\Lexer and Parser Merged"
+#        { "DUNE_OCAML_HARDCODED" : "/home/phillip/.opam/default/lib"
+#        ; "DUNE_OCAML_STDLIB" : "/usr/lib/ocaml"
+#        ; "DUNE_SOURCEROOT" : "/home/phillip/Lexer and Parser Merged"
 #        ; "INSIDE_DUNE" :
-#            "C:\\OCaml64\\home\\Phillip\\Lexer and Parser Merged\\_build/default"
-#        ; "MANPATH" :
-#            "C:\\OCaml64\\home\\Phillip\\Lexer and Parser Merged\\_build/install/default/bin"
-#        ; "OCAML_COLOR" : "always"
+#            "/home/phillip/Lexer and Parser Merged/_build/default"
 #        ; "OCAMLFIND_IGNORE_DUPS_IN" :
-#            "C:\\OCaml64\\home\\Phillip\\Lexer and Parser Merged\\_build/install/default/lib"
+#            "/home/phillip/Lexer and Parser Merged/_build/install/default/lib"
 #        ; "OCAMLPATH" :
-#            "C:\\OCaml64\\home\\Phillip\\Lexer and Parser Merged\\_build/install/default/lib"
+#            "/home/phillip/Lexer and Parser Merged/_build/install/default/lib"
 #        ; "OCAMLTOP_INCLUDE_PATH" :
-#            "C:\\OCaml64\\home\\Phillip\\Lexer and Parser Merged\\_build/install/default/lib/toplevel"
+#            "/home/phillip/Lexer and Parser Merged/_build/install/default/lib/toplevel"
+#        ; "OCAML_COLOR" : "always"
 #        ; "OPAMCOLOR" : "always"
 #        }
-#  ; findlib_path =
-#      [ External
-#          "C:\\\\OCaml64\\\\home\\\\Phillip\\\\.opam\\\\4.13.1+mingw64c\\lib"
-#      ]
+#  ; findlib_path = [ External "/home/phillip/.opam/default/lib" ]
 #  ; arch_sixtyfour = true
 #  ; natdynlink_supported = true
 #  ; supports_shared_libraries = true
 #  ; ocaml_config =
-#      { version = "4.13.1"
-#      ; standard_library_default =
-#          "C:/cygwin/home/appveyor/.opam/4.13.1+mingw64c/lib/ocaml"
-#      ; standard_library =
-#          "C:/OCaml64/home/Phillip/.opam/4.13.1+mingw64c/lib/ocaml"
+#      { version = "4.08.1"
+#      ; standard_library_default = "/usr/lib/ocaml"
+#      ; standard_library = "/usr/lib/ocaml"
 #      ; standard_runtime = "the_standard_runtime_variable_was_deleted"
 #      ; ccomp_type = "cc"
-#      ; c_compiler = "x86_64-w64-mingw32-gcc"
-#      ; ocamlc_cflags =
-#          [ "-O2"; "-fno-strict-aliasing"; "-fwrapv"; "-mms-bitfields" ]
-#      ; ocamlc_cppflags = []
-#      ; ocamlopt_cflags =
-#          [ "-O2"; "-fno-strict-aliasing"; "-fwrapv"; "-mms-bitfields" ]
-#      ; ocamlopt_cppflags = []
+#      ; c_compiler = "x86_64-linux-gnu-gcc"
+#      ; ocamlc_cflags = [ "-O2"; "-fno-strict-aliasing"; "-fwrapv"; "-fPIC" ]
+#      ; ocamlc_cppflags = [ "-D_FILE_OFFSET_BITS=64"; "-D_REENTRANT" ]
+#      ; ocamlopt_cflags = [ "-O2"; "-fno-strict-aliasing"; "-fwrapv" ]
+#      ; ocamlopt_cppflags = [ "-D_FILE_OFFSET_BITS=64"; "-D_REENTRANT" ]
 #      ; bytecomp_c_compiler =
-#          [ "x86_64-w64-mingw32-gcc"
+#          [ "x86_64-linux-gnu-gcc"
 #          ; "-O2"
 #          ; "-fno-strict-aliasing"
 #          ; "-fwrapv"
-#          ; "-mms-bitfields"
+#          ; "-fPIC"
+#          ; "-D_FILE_OFFSET_BITS=64"
+#          ; "-D_REENTRANT"
 #          ]
-#      ; bytecomp_c_libraries = [ "-lws2_32"; "-lversion" ]
+#      ; bytecomp_c_libraries = [ "-lm"; "-ldl"; "-lpthread" ]
 #      ; native_c_compiler =
-#          [ "x86_64-w64-mingw32-gcc"
+#          [ "x86_64-linux-gnu-gcc"
 #          ; "-O2"
 #          ; "-fno-strict-aliasing"
 #          ; "-fwrapv"
-#          ; "-mms-bitfields"
+#          ; "-D_FILE_OFFSET_BITS=64"
+#          ; "-D_REENTRANT"
 #          ]
-#      ; native_c_libraries = [ "-lws2_32"; "-lversion" ]
-#      ; cc_profile = []
+#      ; native_c_libraries = [ "-lm"; "-ldl" ]
+#      ; cc_profile = [ "-pg" ]
 #      ; architecture = "amd64"
 #      ; model = "default"
 #      ; int_size = 63
 #      ; word_size = 64
-#      ; system = "mingw64"
-#      ; asm = [ "x86_64-w64-mingw32-gcc"; "-c" ]
-#      ; asm_cfi_supported = false
+#      ; system = "linux"
+#      ; asm = [ "x86_64-linux-gnu-as" ]
+#      ; asm_cfi_supported = true
 #      ; with_frame_pointers = false
-#      ; ext_exe = ".exe"
+#      ; ext_exe = ""
 #      ; ext_obj = ".o"
 #      ; ext_asm = ".s"
 #      ; ext_lib = ".a"
-#      ; ext_dll = ".dll"
-#      ; os_type = "Win32"
-#      ; default_executable_name = "camlprog.exe"
+#      ; ext_dll = ".so"
+#      ; os_type = "Unix"
+#      ; default_executable_name = "a.out"
 #      ; systhread_supported = true
-#      ; host = "x86_64-w64-mingw32"
-#      ; target = "x86_64-w64-mingw32"
-#      ; profiling = false
+#      ; host = "x86_64-pc-linux-gnu"
+#      ; target = "x86_64-pc-linux-gnu"
+#      ; profiling = true
 #      ; flambda = false
 #      ; spacetime = false
-#      ; safe_string = true
-#      ; exec_magic_number = "Caml1999X030"
-#      ; cmi_magic_number = "Caml1999I030"
-#      ; cmo_magic_number = "Caml1999O030"
-#      ; cma_magic_number = "Caml1999A030"
-#      ; cmx_magic_number = "Caml1999Y030"
-#      ; cmxa_magic_number = "Caml1999Z030"
-#      ; ast_impl_magic_number = "Caml1999M030"
-#      ; ast_intf_magic_number = "Caml1999N030"
-#      ; cmxs_magic_number = "Caml1999D030"
-#      ; cmt_magic_number = "Caml1999T030"
+#      ; safe_string = false
+#      ; exec_magic_number = "Caml1999X025"
+#      ; cmi_magic_number = "Caml1999I025"
+#      ; cmo_magic_number = "Caml1999O025"
+#      ; cma_magic_number = "Caml1999A025"
+#      ; cmx_magic_number = "Caml1999Y025"
+#      ; cmxa_magic_number = "Caml1999Z025"
+#      ; ast_impl_magic_number = "Caml1999M025"
+#      ; ast_intf_magic_number = "Caml1999N025"
+#      ; cmxs_magic_number = "Caml1999D025"
+#      ; cmt_magic_number = "Caml1999T025"
 #      ; natdynlink_supported = true
 #      ; supports_shared_libraries = true
-#      ; windows_unicode = true
+#      ; windows_unicode = false
 #      }
 #  }
-# Workspace root: "C:\\OCaml64\\home\\Phillip\\Lexer and Parser Merged"
+# Workspace root: "/home/phillip/Lexer and Parser Merged"
+$ (cd _build/default && /usr/bin/ocamlc.opt -w @1..3@5..28@30..39@43@46..47@49..57@61..62-40 -strict-sequence -strict-formats -short-paths -keep-locs -g -bin-annot -I web_run/.main.eobjs/byte -I /home/phillip/.opam/default/lib/bytes -I /home/phillip/.opam/default/lib/ounit2 -I /home/phillip/.opam/default/lib/ounit2/advanced -I /home/phillip/.opam/default/lib/stdlib-shims -I src/.interp.objs/byte -no-alias-deps -opaque -o web_run/.main.eobjs/byte/dune__exe__Main.cmo -c -impl web_run/main.ml)
+$ (cd _build/default && /usr/bin/ocamlopt.opt -w @1..3@5..28@30..39@43@46..47@49..57@61..62-40 -strict-sequence -strict-formats -short-paths -keep-locs -g -I web_run/.main.eobjs/byte -I web_run/.main.eobjs/native -I /home/phillip/.opam/default/lib/bytes -I /home/phillip/.opam/default/lib/ounit2 -I /home/phillip/.opam/default/lib/ounit2/advanced -I /home/phillip/.opam/default/lib/stdlib-shims -I src/.interp.objs/byte -I src/.interp.objs/native -intf-suffix .ml -no-alias-deps -opaque -o web_run/.main.eobjs/native/dune__exe__Main.cmx -c -impl web_run/main.ml)
+$ (cd _build/default && /usr/bin/ocamlopt.opt -w @1..3@5..28@30..39@43@46..47@49..57@61..62-40 -strict-sequence -strict-formats -short-paths -keep-locs -g -o web_run/main.exe src/interp.cmxa /usr/lib/ocaml/unix.cmxa -I /usr/lib/ocaml /home/phillip/.opam/default/lib/stdlib-shims/stdlib_shims.cmxa /home/phillip/.opam/default/lib/ounit2/advanced/oUnitAdvanced.cmxa /home/phillip/.opam/default/lib/ounit2/oUnit.cmxa web_run/.main.eobjs/native/dune__exe__Main.cmx)
