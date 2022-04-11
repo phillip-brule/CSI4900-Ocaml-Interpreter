@@ -5,7 +5,17 @@
     <link rel="stylesheet" href="compiler.css">
    
 </head>
-
+<?php
+              
+if(isset($_POST['textdata']))
+{
+$data=$_POST['textdata'];
+$fp = fopen('test.txt', 'w');
+fwrite($fp, $data);
+fclose($fp);
+exec('make web_run', $output, $return_status);
+}
+?>
 <body>
     <?php include "nav.php"?>
     <div class="header">
@@ -15,7 +25,7 @@
     <form method="post">
         <button type="submit" name="submit">RUN</button><br>
         <textarea placeholder= "Enter Your Text Here" type="text" name="textdata"></textarea>
-        <div class="divs"></div>
+        <div class="divs"><?php echo $output?></div>
     </form>
     <br>
     <br>
@@ -33,15 +43,4 @@
 </body>
 </html>
 
-<?php
-              
-if(isset($_POST['textdata']))
-{
-$data=$_POST['textdata'];
-$fp = fopen('test.txt', 'w');
-fwrite($fp, $data);
-fclose($fp);
-exec('make web_run', $output, $return_status);
-echo $output;
-}
-?>
+
