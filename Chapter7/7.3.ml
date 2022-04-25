@@ -52,20 +52,12 @@ let empty_tenv () : tenv = Empty_tenv
 let extend_tenv (v:var) (value:expType) (e:tenv) : tenv = 
   Extend_tenv(v, value, e)
 
-let rec apply_env(e:tenv) (search_v:var) : expType = 
+let rec apply_tenv(e:tenv) (search_v:var) : expType = 
   match e with
   | Empty_tenv -> raise Invalid
   | Extend_tenv(variable, value, envNext) -> if variable = search_v then value 
-      else apply_env envNext search_v 
+      else apply_tenv envNext search_v 
           
-          
-let expType_to_list(exp: expType) : expType list =
-  match exp with
-  |Int_type -> [Int_type]
-  |Bool_type -> [Bool_type]
-  |Proc_type(arg, res) -> arg :: res :: [] 
-
-                
 let rec type_to_external_form (ty: expType): expType list =
   match ty with
   |Int_type -> [Int_type]
@@ -79,7 +71,7 @@ let rec expType_to_str (v: expType): string =
   |Proc_type(res,arg) -> expType_to_str res^" -> "^ expType_to_str arg 
           
 let report_unequal_types (ty1: expType) (ty2: expType) (exp: expression) = 
-  (type_to_external_form ty1);(type_to_external_form ty2)
+  "Types dont equal";(type_to_external_form ty1);(type_to_external_form ty2)
   
 let check_equal_type (ty1: expType) (ty2: expType) (exp: expression) : expType list = 
   if (ty1 == ty2) then [ty1] else (report_unequal_types ty1 ty2 exp);;
@@ -87,7 +79,7 @@ let check_equal_type (ty1: expType) (ty2: expType) (exp: expression) : expType l
 let rec type_of(exp: expression) (tenv: tenv): expType = 
   match exp with
   |Const_exp(num) -> Int_type 
-  |Var_exp(var) -> (apply_env tenv var)
+  |Var_exp(var) -> (apply_tenv tenv var)
   |Diff_exp(exp1,exp2) -> 
       let ty1 = (type_of exp1 tenv) in
       let ty2 = (type_of exp2 tenv) in
@@ -114,7 +106,7 @@ let rec type_of(exp: expression) (tenv: tenv): expType =
       |_ -> exp1_type
       |Proc_type(arg,res)-> (check_equal_type arg exp2_type exp2); res
 
-let value_of_program (p:program) : string = 
+let type_of_program (p:program) : string = 
   match p with
   | Expression(exp) -> let init_env = empty_tenv() in 
       expType_to_str (type_of exp init_env)
@@ -127,12 +119,12 @@ let example_run () =
                       Let_exp("x", Const_exp(100), 
                               Let_exp("g", Proc_exp("z", Int_type, Diff_exp(Var_exp("z"), Var_exp("x"))),
                                       Diff_exp(Call_exp(Var_exp("f"),Const_exp(1)), Call_exp(Var_exp("g"),Const_exp(1))))))))in
-  print_string(value_of_program p)
+  print_string(type_of_program p)
     
 let example_run2() = 
   let p = Expression(Proc_exp("z", Int_type, Proc_exp("x", Int_type, Zero_exp(Diff_exp(Const_exp(200), Const_exp(100)))))) in
   
-  print_string(value_of_program p)
+  print_string(type_of_program p)
     
 let example_run3() = 
   let p = Expression(
@@ -140,9 +132,9 @@ let example_run3() =
               Let_exp("f", Proc_exp("z", Int_type, Diff_exp(Var_exp("z"), Var_exp("x"))), 
                       Let_exp("x", Const_exp(100), 
                               Let_exp("g", Proc_exp("z", Int_type, Diff_exp(Var_exp("z"), Var_exp("x"))),
-                                      Let_exp("a", Diff_exp(Call_exp(Var_exp("f"),Const_exp(1)), Call_exp(Var_exp("g"),Const_exp(1))),
+                                      Let_exp("a", Diff_exp(Call_exp(Var_exp("f"),Var_exp("b")), Call_exp(Var_exp("g"),Const_exp(1))),
                                               Zero_exp(Var_exp("a"))))))))  in
-  print_string(value_of_program p)
+  print_string(type_of_program p)
     
 let () = example_run()
 let () = example_run2()

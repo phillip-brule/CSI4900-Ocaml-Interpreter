@@ -1,12 +1,11 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Store form data in .txt file</title>
+    <title>Interpreter</title>
     <link rel="stylesheet" href="compiler.css">
    
 </head>
-<?php
-              
+<?php   
 if(isset($_POST['textdata']))
 {
 $data=$_POST['textdata'];
@@ -20,7 +19,7 @@ exec('make web_run', $output, $return_status);
     <?php include "nav.php"?>
     <div class="header">
         <a href="index.php">&lt; Home</a>
-        <h1>Compiler</h1>
+        <h1>Interpreter</h1>
     </div>   
     <form method="post">
         <button type="submit" name="submit">RUN</button><br>

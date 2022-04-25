@@ -11,14 +11,7 @@ type expType =
   | Tvar_type of tvar
   | Proc_type of expType*expType 
                  
-type optionType = No_type | A_type of expType
-
-type s_exp = S_exp of char | S_exp_list of slist
-               
-and slist = S_list of s_exp list  
-
-type tuple = Pair of char*char 
-type alist = ListOf of tuple list
+type optionType = No_type | A_type of expType 
       
 type expression = 
   | Zero_exp of expression
@@ -50,9 +43,6 @@ let rec apply_tenv(e:tenv) (search_v:var) : expType =
   
 let empty_subst () : substitution = []
 
-
-
-    
 let procType_check (typ: expType) :bool = 
   match typ with
   |Proc_type(_, _) -> true
@@ -106,10 +96,12 @@ let rec no_occurrence (tvar: expType) (ty: expType) : bool =
       no_occurrence tvar arg &&
       no_occurrence tvar res
   |Tvar_type (sn)-> not (tvar = ty)
-    
-                      
-
-
+  
+let rec expType_to_str (v: expType): string = 
+  match v with
+  |Int_type -> "int"
+  |Bool_type -> "bool"
+  |Proc_type(res,arg) -> expType_to_str res^" -> "^ expType_to_str arg 
 
   
 let rec type_to_external_form(ty: expType) : string list = 
@@ -214,6 +206,28 @@ let type_of_program(pgm: program): expType =
         end
   end
   
+let example_run () = 
+  let p = A_program(
+      Let_exp("x", Const_exp(200), 
+              Let_exp("f", Proc_exp("z", A_type(Int_type), Diff_exp(Var_exp("z"), Var_exp("x"))), 
+                      Let_exp("x", Const_exp(100), 
+                              Let_exp("g", Proc_exp("z", A_type(Int_type), Diff_exp(Var_exp("z"), Var_exp("x"))),
+                                      Diff_exp(Call_exp(Var_exp("f"),Const_exp(1)), Call_exp(Var_exp("g"),Const_exp(1))))))))in
+  print_string (expType_to_str (type_of_program p))
+    
+let example_run2() = 
+  let p = A_program(Proc_exp("z",No_type , Proc_exp("x", A_type(Int_type), Zero_exp(Diff_exp(Const_exp(200), Const_exp(100)))))) in
+  
+  print_string (expType_to_str(type_of_program p))
+    
+    
+let() = example_run()
+let () = example_run2()
+  
+    
+
+    
+    
 
         
 
