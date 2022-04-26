@@ -30,6 +30,8 @@ type method_decl = {
 	body: expression;
 }
 
+let method_declaration (m_name:var) (vars: var list) (b:expression) : method_decl = 
+	{method_name = MethodName(m_name); variables = vars; body = b;}
 (* class class_declaration *)
 type class_decl = {
 	class_name: className;
@@ -37,6 +39,9 @@ type class_decl = {
 	field_names: var list;
 	method_decls: method_decl list;
 }
+
+let class_declaration (c_name:var) (s_name:var) (vars: var list) (methods:method_decl list) : class_decl = 
+	{class_name = ClassName(c_name); super_class = ClassName(s_name); field_names = vars; method_decls = methods;}
 
 type object_inst = {
 	class_name : className;
@@ -52,7 +57,7 @@ type procedure = {
 }
 
 and env = Empty_env | Extend_env of var * reference * env | Extend_env_rec of var * var * expression * env | Extend_env_list of var list * reference list * env
-and exp_value = ExpVal of int | ExpBool of bool | Proc of procedure | EmptyObjField of var | Obj of object_inst | ObjField of exp_value * var
+and exp_value = ExpVal of int | ExpBool of bool | Proc of procedure | EmptyObjField of var | Obj of object_inst
 
 type den_value = Ref of reference
 
@@ -140,7 +145,7 @@ let rec append_field_names (super_fields: var list) (new_fields: var list) : var
 let add_to_class_env (class_n:className) (class_obj:classType) = 
 	the_class_env := (class_n,class_obj) :: !the_class_env
 
-let rec lookup_class (search_class_n:className) : classType = 
+let lookup_class (search_class_n:className) : classType = 
 	match (List.assoc_opt search_class_n !the_class_env) with 
 	| None -> raise Invalid
 	| Some(class_obj) -> class_obj
@@ -151,9 +156,9 @@ the new method should be placed in the same location as it was before *)
 let rec merge_method_envs (super_env:methodEnv) (new_env:methodEnv) : methodEnv = 
 	match super_env with 
 	| [] -> new_env
-	| (m_name, the_method) :: super_tail -> let same_method_name = List.assoc_opt m_name new_env in 
+	| (m_name, old_method) :: super_tail -> let same_method_name = List.assoc_opt m_name new_env in 
 		match same_method_name with 
-		| None -> super_env @ new_env (*concat the two lists together*)
+		| None -> (m_name, old_method) :: merge_method_envs super_tail new_env
 		| Some(new_method) -> (m_name, new_method) :: merge_method_envs super_tail (List.remove_assoc m_name new_env)
 
 (* initialize store *)
@@ -172,12 +177,13 @@ let find_method (c_name:className) (search_v:methodName) : methodType =
 				| Some(the_method) -> the_method
 				| None -> raise Invalid
 
-(* creationg of the super class for all classes called object *)
+
 let initialize_class_decl (class_declaration:class_decl) =
 	let super_class = lookup_class class_declaration.super_class in
 		let f_names = append_field_names (super_class.field_names) class_declaration.field_names in 
 			add_to_class_env class_declaration.class_name (new_class class_declaration.super_class f_names (merge_method_envs super_class.method_env 
 				(method_decls_to_method_env class_declaration.method_decls class_declaration.super_class f_names)))
+(* creationg of the super class for all classes called object *)
 let initialize_class_env (class_declarations:class_decl list) = 
 	the_class_env := (ClassName("object"), { super_name = ClassName("#f"); field_names = []; method_env = [];}) :: !the_class_env;
 	List.iter initialize_class_decl class_declarations
@@ -324,3 +330,27 @@ let value_of_program (p:program) : exp_value =
   	let init_env = empty_env() in
   		value_of body init_env
 
+let test_classes = 
+	let temp_methods = [(method_declaration "init" ["x"] (Begin_exp([Assign_exp("i", Var_exp("x"));
+																										Assign_exp("j", Diff_exp(Const_exp(0), Var_exp("x")))])));
+											(method_declaration "geti" [] (Var_exp("i")))]
+		in let temp = class_declaration "c1" "object" ["i";"j"] temp_methods in [temp]
+
+let () = print_int(expval_to_num(value_of_program(Program(test_classes, Let_exp("o1", New_object_exp(
+			ClassName("c1"), [Const_exp(3)]), 
+ 	Method_call_exp(Var_exp("o1"), "geti", []))))
+	))
+(* 
+class c1 extends object
+	field i;
+	field j
+	method init (x) 
+		begin
+		set i = x;
+		set j = (0 - x)
+		end
+	;
+	method geti () i
+;
+let o1 = new c1(3) in 
+send o1.geti() *)

@@ -1,0 +1,36 @@
+type token =
+    ZERO
+  | WORD
+  | THEN
+  | SPEAK
+  | SEMICOLON
+  | RPAREN
+  | PUBLIC
+  | PROC
+  | PRIVATE
+  | OUTSIDE
+  | MEANING
+  | LPAREN
+  | LET
+  | INT of int
+  | IN
+  | IF
+  | ID of string
+  | EQUALS
+  | EOF
+  | ENDLANG
+  | END
+  | EMPTY
+  | ELSE
+  | DIFF
+val menhir_begin_marker : int
+val xv_world : Wittgenstein.world
+val xv_separated_nonempty_list_SEMICOLON_INT_ : int list
+val xv_separated_nonempty_list_SEMICOLON_ID_ : string list
+val xv_separated_list_SEMICOLON_INT_ : int list
+val xv_separated_list_SEMICOLON_ID_ : string list
+val xv_prog : Wittgenstein.world
+val xv_loption_separated_nonempty_list_SEMICOLON_INT__ : int list
+val xv_loption_separated_nonempty_list_SEMICOLON_ID__ : string list
+val xv_language : Wittgenstein.language
+val menhir_end_marker : int

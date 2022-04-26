@@ -108,59 +108,25 @@ let procedure (v:var) (body:expression) (environment:env) : procedure =
 
 (* Functions for referencing---------------------------------------------------- *)
 (* reference number is equal to its location *)
-let expval_newref (value:exp_value) : reference = 
-	(* used as help function for newref *)
-	global_store.store <- Array.append global_store.expVal_store [|ExpRefVal(value)|];
-		ExpvalRef((Array.length global_store.expVal_store) - 1)
+let newref (value:reference_value) : reference = 
+	global_store.store <- Array.append global_store.store [|value|];
+		(Array.length global_store.store) - 1
 
-let newref value : reference = 
-	match value with
-	| Expval(_) -> expval_newref value
-	| ExpBool(_) -> expval_newref value
-	| Proc(_) -> expval_newref value
-	| MutPair(_) -> expval_newref value 
-	| Thunk(_) -> global_store.thunk_store <- Array.append global_store.thunk_store [|ThunkRefVal(value)|];
-		ThunkRef((Array.length global_store.thunk_store) -1)
-	| _ -> Raise Invalid_argument("Reference must be thunk of exp_value")
-	
-
-let deref (ref1: reference) : referece_value = 
-	match ref1 with
-	| ExpvalRef(refNum) -> global_store.store.(refNum)
-	| ThunkRef(refNum) -> global_store.store.(refNum)
+let deref (refNum: reference) : reference_value = 
+	global_store.store.(refNum)
 
 (* returns false if setting reference is unsuccessful *)
-let expval_setref (refNum: int) (value: exp_value) : bool = 
+let setref (refNum: reference) (value:reference_value) : bool = 
 	try
-		global_store.expVal_store.(refNum) <- ExpRefVal(value);
+		global_store.store.(refNum) <- value;
 			true
 	with
 		Invalid_argument(_) -> false
-
-let thunk_setref (refNum: int) (value: thunk) : bool = 
-	try
-		global_store.thunk_store.(refNum) <- ThunkRefVal(value);
-			true
-	with
-		Invalid_argument(_) -> false
-
-let setref (ref1: reference) value : bool = 
-	match ref1 with
-	| ExpvalRef(refNum) -> begin match value with 
-		| Expval(_) -> expval_setref refNum value
-		| ExpBool(_) -> expval_setref refNum value
-		| Proc(_) -> expval_setref refNum value
-		| MutPair(_) -> expval_setref refNum value
-		| _ -> raise Invalid_argument("Invalid")
-	end 
-	| ThunkRef(refNum) -> begin match value with 
-		| Thunk(_) -> thunk_setref value
-		| _ -> Invalid_argument("Invalid")
 
 (* Functions for mutable pairs------------------------------------------------------- *)
 let make_pair (val1:exp_value) (val2:exp_value) : mut_pair =
-	{left_loc = (newref val1);
-	right_loc = (newref val2);}
+	{left_loc = (newref (ExpRefVal(val1)));
+	right_loc = (newref (ExpRefVal(val2)));}
 let left (pair:mut_pair) : exp_value =
 	let res = deref pair.left_loc in 
 	match res with
@@ -172,11 +138,11 @@ let right (pair:mut_pair) : exp_value =
 	| ExpvalRef(value) -> value
 	| _ -> raise Invalid
 let setleft (pair:mut_pair) (value:exp_value) =
-	if expval_setref pair.left_loc value then 
+	if setref (ExpRefVal(pair.left_loc)) value then 
 	print_string "Left pair value set success" else
 	raise (Failure "Assignment failure")
 let setright (pair:mut_pair) (value:exp_value) =
-	if expval_setref pair.right_loc value then 
+	if setref (ExpRefVal(pair.right_loc)) value then 
 	print_string "Right pair value set success" else
 	raise (Failure "Assignment failure")
 
@@ -188,8 +154,8 @@ let rec value_of (exp:expression) (environment:env) : exp_value =
 		let w = deref ref1 in
 		match w with 
 		| ExpRefVal(value) -> value
-		| ThunkRefVal(value) -> let val1 = value_of_thunk w in
-			setref ref1 val1; val1
+		| ThunkRefVal(value) -> let val1 = value_of_thunk value in
+			let _throw = setref ref1 val1 in val1
 	| Diff_exp(exp1,exp2) -> let val1 = expval_to_num (value_of exp1 environment) in
 		let val2 = expval_to_num (value_of exp2 environment) in 
 		num_val (val1 - val2)
@@ -203,7 +169,7 @@ let rec value_of (exp:expression) (environment:env) : exp_value =
 	end
 	(* let expressions are still pass by value *)
 	| Let_exp(variable, exp1, body) ->
-		value_of body (extend_env variable (newref (value_of exp1 environment)) environment)
+		value_of body (extend_env variable (newref (ExpRefVal((value_of exp1 environment)))) environment)
 			(* creates procedure in context of current environment *)
 	| Proc_exp(var, body) -> proc_val (procedure var body environment)
 	(* type check to make sure a proc is the operator but said proc has to be evaluted first *)
@@ -212,7 +178,7 @@ let rec value_of (exp:expression) (environment:env) : exp_value =
 		let apply_procedure (p:procedure) (refNum:reference) : exp_value = 
   			value_of p.body (extend_env p.var refNum p.saved_env) in
 					apply_procedure proc arg
-	| Assign_exp(var, exp1) -> if expval_setref (apply_env environment var) (value_of exp1 environment) then print_string "Varriable Assignment Success  " else raise (Failure "variable assignment failure");
+	| Assign_exp(var, exp1) -> if setref (ExpRefVal((apply_env environment var))) (value_of exp1 environment) then print_string "Varriable Assignment Success  " else raise (Failure "variable assignment failure");
 		num_val 27
 	| Newpair_exp(exp1,exp2) -> mutpair_val (make_pair (value_of exp1 environment) (value_of exp2 environment))
 	| Left_exp(exp1) -> let val1 = value_of exp1 environment in

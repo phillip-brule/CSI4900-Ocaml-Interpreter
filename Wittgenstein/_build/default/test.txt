@@ -1,0 +1,11 @@
+Public Language
+word: asdf 
+meaning: 23
+end language
+Private Language
+word: dfsa meaning: 1
+end language
+outside sensations
+3;5;1
+speak words
+asdf; dfsa; Sensation a

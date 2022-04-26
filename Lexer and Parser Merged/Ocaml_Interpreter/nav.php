@@ -57,7 +57,7 @@
 <div id="mySidenav" class="sidenav">
     <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
     <a href="about.php">About</a>
-    <a href="compiler.php">Compiler</a>
+    <a href="interpreter.php">Interpreter</a>
     <a href="manual.php">Manual</a>
 </div>
 
